@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>3-Day Gym Tracker</title>
+  <style>
+    :root {
+      --bg-1: #f8f4e8;
+      --bg-2: #eaf0f5;
+      --card: #fffdf9;
+      --ink: #17222d;
+      --muted: #4d5f72;
+      --accent: #0e9f6e;
+      --accent-2: #0b74b8;
+      --line: #d8e0e8;
+      --danger: #c23a2b;
+      --shadow: 0 12px 30px rgba(16, 38, 56, 0.08);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, #ffe8b4 0%, transparent 35%),
+        radial-gradient(circle at 90% 20%, #d6f1e6 0%, transparent 28%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2));
+      min-height: 100vh;
+      line-height: 1.4;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+      animation: rise 0.5s ease;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 2.5vw, 2.6rem);
+      letter-spacing: 0.01em;
+    }
+
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .top-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 1.08rem;
+    }
+
+    .card p {
+      margin: 6px 0;
+      color: var(--muted);
+    }
+
+    .inputs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(120px, 1fr));
+      gap: 8px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    input,
+    select,
+    button,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 10px;
+      background: #ffffff;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 44px;
+      resize: vertical;
+    }
+
+    .btn {
+      cursor: pointer;
+      font-weight: 700;
+      border: none;
+      color: white;
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    .btn:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .btn.secondary {
+      background: #e9f2f9;
+      color: #12324b;
+      border: 1px solid #c9d8e6;
+    }
+
+    .notice {
+      font-size: 0.9rem;
+      padding: 10px;
+      border-radius: 10px;
+      background: #fff4ea;
+      border: 1px solid #f2d7bf;
+      color: #694d39;
+      margin-top: 8px;
+    }
+
+    .protein-result {
+      margin-top: 8px;
+      font-weight: 700;
+      color: #0a4f68;
+      background: #e6f8fb;
+      border: 1px solid #bde6ef;
+      border-radius: 10px;
+      padding: 10px;
+      min-height: 44px;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0 0;
+    }
+
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #edf7ef;
+      border: 1px solid #c7e8cc;
+      font-size: 0.85rem;
+      color: #255b2d;
+      font-weight: 700;
+    }
+
+    .day {
+      margin-top: 14px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .day-head {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(90deg, #f8fbff, #f8fff7);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .day-head h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .day-head p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      padding: 0 8px 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 820px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 8px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+
+    th {
+      color: #244159;
+      background: #fbfdff;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .done-cell {
+      text-align: center;
+      width: 42px;
+    }
+
+    .done {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .exercise {
+      font-weight: 700;
+    }
+
+    .video-link {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #0b74b8;
+      border-bottom: 1px solid #9dc7e3;
+    }
+
+    .video-link:hover {
+      color: #095985;
+      border-bottom-color: #095985;
+    }
+
+    .small {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
+    }
+
+    .pain {
+      width: 62px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .pain.high {
+      border-color: #f2b0aa;
+      background: #fff0ef;
+      color: var(--danger);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .footer-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: 8px 0 0;
+    }
+
+    @media (max-width: 760px) {
+      .inputs {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>3-Day Gym Checklist + Load Tracker</h1>
+    <p class="subtitle">Goal: fat loss + muscle gain, while reducing heavy deadlift/squat loading until glute pain settles.</p>
+
+    <section class="top-grid">
+      <article class="card">
+        <h2>Week Setup</h2>
+        <div class="inputs">
+          <div>
+            <label for="weekOf">Week Of</label>
+            <input type="date" id="weekOf" />
+          </div>
+          <div>
+            <label for="bw">Body Weight (kg)</label>
+            <input type="number" id="bw" min="30" max="250" step="0.1" placeholder="e.g., 78" />
+          </div>
+          <div>
+            <label for="goal">Goal Focus</label>
+            <select id="goal">
+              <option value="recomp">Fat loss + muscle gain (recommended)</option>
+              <option value="cut">Aggressive fat loss</option>
+              <option value="maintain">Maintenance / slow gain</option>
+            </select>
+          </div>
+          <div>
+            <button class="btn" id="calcProtein">Calculate Protein</button>
+          </div>
+        </div>
+        <div class="protein-result" id="proteinResult">Enter body weight and press Calculate Protein.</div>
+        <div class="notice">Pain rule: keep glute pain at or below 3/10 during training. If pain shoots down leg, causes numbness/weakness, or worsens over time, stop and get a clinician assessment.</div>
+      </article>
+
+      <article class="card">
+        <h2>Program Notes</h2>
+        <p><strong>Schedule:</strong> Day 1 (Mon), Day 2 (Wed), Day 3 (Fri) or any non-consecutive pattern.</p>
+        <p><strong>Progression:</strong> when you hit top reps for all sets, increase load 2.5-5% next week.</p>
+        <p><strong>Intensity:</strong> leave 1-2 reps in reserve on most sets.</p>
+        <p><strong>Warm-up:</strong> 5-8 min cardio + 2 light ramp sets for first two exercises.</p>
+        <div class="summary" id="summaryPills"></div>
+      </article>
+    </section>
+
+    <section id="days"></section>
+
+    <section class="actions">
+      <button class="btn" id="saveNow">Save Progress</button>
+      <button class="btn secondary" id="clearWeek">Clear This Week</button>
+      <button class="btn secondary" id="exportCsv">Export CSV</button>
+    </section>
+
+    <p class="footer-note">Data is stored locally in your browser (`localStorage`) on this device.</p>
+  </main>
+
+  <script>
+    const plan = [
+      {
+        id: "day1",
+        name: "Day 1 - Upper + Quads",
+        focus: "Chest, back, shoulders, quads, hamstrings, arms",
+        exercises: [
+          ["Incline Dumbbell Press", "3 x 6-10"],
+          ["Seated Cable Row", "3 x 8-12"],
+          ["Machine Shoulder Press", "3 x 8-12"],
+          ["Lat Pulldown", "3 x 8-12"],
+          ["Leg Press", "3 x 10-15"],
+          ["Lying or Seated Hamstring Curl", "3 x 10-15"],
+          ["Cable Lateral Raise", "2 x 12-20"],
+          ["Triceps Pressdown", "2 x 10-15"],
+          ["Dumbbell Curl", "2 x 10-15"]
+        ]
+      },
+      {
+        id: "day2",
+        name: "Day 2 - Lower + Push/Pull",
+        focus: "Glute-safe lower body + chest and back volume",
+        exercises: [
+          ["Bulgarian Split Squat", "3 x 8-12 / leg"],
+          ["Hip Thrust (machine or barbell, moderate)", "3 x 8-12"],
+          ["Flat Dumbbell Bench Press", "3 x 8-12"],
+          ["Chest-Supported Row", "3 x 8-12"],
+          ["Leg Extension", "3 x 12-15"],
+          ["Seated Leg Curl", "3 x 10-15"],
+          ["Standing Calf Raise", "3 x 12-20"],
+          ["Plank", "3 x 30-45 sec"]
+        ]
+      },
+      {
+        id: "day3",
+        name: "Day 3 - Full Body (Light Hinge)",
+        focus: "Second full hit for all major groups with lighter hinge work",
+        exercises: [
+          ["Goblet Squat or Hack Squat (moderate)", "3 x 10-15"],
+          ["Romanian Deadlift (light, optional)", "2 x 8-10"],
+          ["Pull-Up or Assisted Pull-Up", "3 x 6-10"],
+          ["Machine or Cable Chest Press", "3 x 8-12"],
+          ["Single-Arm Cable Row", "2 x 10-12 / side"],
+          ["Face Pull", "2 x 12-20"],
+          ["Reverse Lunge", "2 x 8-10 / leg"],
+          ["Dead Bug", "3 x 8-10 / side"]
+        ]
+      }
+    ];
+
+    const stateKey = "gymTrackerState_v1";
+
+    function createRow(dayId, idx, exercise, target) {
+      const rowId = `${dayId}_${idx}`;
+      const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${exercise} exercise proper form`)}`;
+      return `
+        <tr>
+          <td class="done-cell"><input type="checkbox" class="done" data-k="${rowId}_done" /></td>
+          <td>
+            <div class="exercise">${exercise}</div>
+            <a class="video-link" href="${videoUrl}" target="_blank" rel="noopener noreferrer">Video</a>
+          </td>
+          <td class="small">${target}</td>
+          <td><input type="text" inputmode="decimal" data-k="${rowId}_weight" placeholder="kg" /></td>
+          <td><input type="text" data-k="${rowId}_reps" placeholder="e.g., 10,10,9" /></td>
+          <td><input type="number" class="pain" min="0" max="10" data-k="${rowId}_pain" placeholder="0-10" /></td>
+          <td><textarea data-k="${rowId}_notes" placeholder="tempo, RIR, cues..."></textarea></td>
+        </tr>
+      `;
+    }
+
+    function renderDays() {
+      const host = document.getElementById("days");
+      host.innerHTML = plan.map(day => `
+        <article class="card day">
+          <div class="day-head">
+            <div>
+              <h3>${day.name}</h3>
+              <p>${day.focus}</p>
+            </div>
+            <div class="pill" id="${day.id}_done">0/${day.exercises.length} complete</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Done</th>
+                  <th>Exercise</th>
+                  <th>Target</th>
+                  <th>Weight</th>
+                  <th>Reps</th>
+                  <th>Pain</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${day.exercises.map((ex, i) => createRow(day.id, i, ex[0], ex[1])).join("")}
+              </tbody>
+            </table>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function getAllInputs() {
+      return Array.from(document.querySelectorAll("[data-k], #weekOf, #bw, #goal"));
+    }
+
+    function saveState() {
+      const state = {};
+      getAllInputs().forEach(el => {
+        const key = el.dataset.k || el.id;
+        if (!key) return;
+        state[key] = el.type === "checkbox" ? el.checked : el.value;
+      });
+      localStorage.setItem(stateKey, JSON.stringify(state));
+      updateSummary();
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem(stateKey);
+      if (!raw) return;
+      try {
+        const state = JSON.parse(raw);
+        getAllInputs().forEach(el => {
+          const key = el.dataset.k || el.id;
+          if (!key || !(key in state)) return;
+          if (el.type === "checkbox") {
+            el.checked = Boolean(state[key]);
+          } else {
+            el.value = state[key];
+          }
+        });
+      } catch (e) {
+        console.error("Could not load saved state", e);
+      }
+    }
+
+    function setCurrentWeek() {
+      const weekOf = document.getElementById("weekOf");
+      if (weekOf.value) return;
+      const d = new Date();
+      const day = d.getDay();
+      const diff = (day === 0 ? -6 : 1) - day;
+      d.setDate(d.getDate() + diff);
+      weekOf.value = d.toISOString().slice(0, 10);
+    }
+
+    function updateSummary() {
+      let total = 0;
+      let done = 0;
+
+      plan.forEach(day => {
+        let dayDone = 0;
+        day.exercises.forEach((_, idx) => {
+          total += 1;
+          const cb = document.querySelector(`[data-k="${day.id}_${idx}_done"]`);
+          if (cb && cb.checked) {
+            dayDone += 1;
+            done += 1;
+          }
+        });
+        const target = document.getElementById(`${day.id}_done`);
+        if (target) target.textContent = `${dayDone}/${day.exercises.length} complete`;
+      });
+
+      const pills = document.getElementById("summaryPills");
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      pills.innerHTML = `
+        <div class="pill">Weekly completion: ${done}/${total} (${pct}%)</div>
+        <div class="pill">Major muscle groups touched 2x/week</div>
+      `;
+
+      document.querySelectorAll(".pain").forEach(el => {
+        const v = Number(el.value);
+        el.classList.toggle("high", Number.isFinite(v) && v >= 4);
+      });
+    }
+
+    function calcProtein() {
+      const bw = Number(document.getElementById("bw").value);
+      const goal = document.getElementById("goal").value;
+      const out = document.getElementById("proteinResult");
+
+      if (!Number.isFinite(bw) || bw <= 0) {
+        out.textContent = "Enter a valid body weight in kg.";
+        return;
+      }
+
+      let min;
+      let max;
+      if (goal === "cut") {
+        min = 2.0;
+        max = 2.4;
+      } else if (goal === "maintain") {
+        min = 1.6;
+        max = 2.0;
+      } else {
+        min = 1.8;
+        max = 2.2;
+      }
+
+      const gramsMin = Math.round(bw * min);
+      const gramsMax = Math.round(bw * max);
+
+      out.innerHTML = `${gramsMin}-${gramsMax} g protein/day (${min.toFixed(1)}-${max.toFixed(1)} g/kg).<br>Split over 3-5 meals, ~25-45 g per meal.`;
+    }
+
+    function clearWeek() {
+      if (!confirm("Clear all saved entries for this tracker?")) return;
+      localStorage.removeItem(stateKey);
+      getAllInputs().forEach(el => {
+        if (el.type === "checkbox") {
+          el.checked = false;
+        } else {
+          el.value = "";
+        }
+      });
+      setCurrentWeek();
+      document.getElementById("goal").value = "recomp";
+      document.getElementById("proteinResult").textContent = "Enter body weight and press Calculate Protein.";
+      updateSummary();
+    }
+
+    function exportCsv() {
+      const lines = [["week_of", "day", "exercise", "target", "done", "weight_kg", "reps", "pain", "notes"]];
+      const week = document.getElementById("weekOf").value;
+
+      plan.forEach(day => {
+        day.exercises.forEach((ex, idx) => {
+          const prefix = `${day.id}_${idx}`;
+          const done = document.querySelector(`[data-k="${prefix}_done"]`)?.checked ? "yes" : "no";
+          const weight = document.querySelector(`[data-k="${prefix}_weight"]`)?.value || "";
+          const reps = document.querySelector(`[data-k="${prefix}_reps"]`)?.value || "";
+          const pain = document.querySelector(`[data-k="${prefix}_pain"]`)?.value || "";
+          const notes = document.querySelector(`[data-k="${prefix}_notes"]`)?.value || "";
+          lines.push([week, day.name, ex[0], ex[1], done, weight, reps, pain, notes]);
+        });
+      });
+
+      const csv = lines
+        .map(row => row.map(v => `"${String(v).replaceAll('"', '""')}"`).join(","))
+        .join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `gym_tracker_${week || "week"}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function bindEvents() {
+      document.getElementById("calcProtein").addEventListener("click", () => {
+        calcProtein();
+        saveState();
+      });
+
+      document.getElementById("saveNow").addEventListener("click", saveState);
+      document.getElementById("clearWeek").addEventListener("click", clearWeek);
+      document.getElementById("exportCsv").addEventListener("click", exportCsv);
+
+      document.body.addEventListener("input", e => {
+        const t = e.target;
+        if (!t.matches("[data-k], #weekOf, #bw, #goal")) return;
+        saveState();
+      });
+
+      document.body.addEventListener("change", e => {
+        const t = e.target;
+        if (t.matches("[data-k], #weekOf, #bw, #goal")) {
+          saveState();
+        }
+      });
+    }
+
+    function init() {
+      renderDays();
+      setCurrentWeek();
+      bindEvents();
+      loadState();
+      if (!document.getElementById("goal").value) {
+        document.getElementById("goal").value = "recomp";
+      }
+      updateSummary();
+    }
+
+    init();
+  </script>
+</body>
+</html>
