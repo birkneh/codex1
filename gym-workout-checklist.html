@@ -505,6 +505,25 @@
       border: 1px solid #f1dfbc;
     }
 
+    .timer-stack {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .timer-wrap:first-child {
+      margin-top: 0;
+    }
+
+    .timer-label {
+      margin: 0 0 4px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #5e451e;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
     .timer-time {
       font-size: clamp(1.6rem, 5vw, 2.2rem);
       margin: 0 0 8px;
@@ -512,6 +531,11 @@
       letter-spacing: 0.02em;
       font-weight: 700;
       color: #6e4a11;
+    }
+
+    .timer-time.slim {
+      font-size: clamp(1.3rem, 4.2vw, 1.8rem);
+      color: #5b6f24;
     }
 
     .timer-controls {
@@ -797,6 +821,15 @@
               <button class="btn secondary" data-duration="12">12 min</button>
               <button class="btn secondary" data-duration="15">15 min</button>
             </div>
+            <div class="timer-wrap" id="followTimedTimerWrap">
+              <p class="timer-label">Timed Exercise Countdown</p>
+              <p class="timer-time slim" id="followTimedTimer">00:00</p>
+              <div class="timer-controls">
+                <button class="btn" id="followTimedStart">Start</button>
+                <button class="btn secondary" id="followTimedAdd">+1 min</button>
+                <button class="btn secondary" id="followTimedReset">Reset</button>
+              </div>
+            </div>
           </div>
           <div>
             <label for="followPain">Pain (0-10)</label>
@@ -808,12 +841,23 @@
           </div>
         </div>
 
-        <div class="timer-wrap">
-          <p class="timer-time" id="followTimer">01:15</p>
-          <div class="timer-controls">
-            <button class="btn" id="followTimerStart">Start Rest</button>
-            <button class="btn secondary" id="followTimerAdd">+15s</button>
-            <button class="btn secondary" id="followTimerReset">Reset</button>
+        <div class="timer-stack">
+          <div class="timer-wrap">
+            <p class="timer-label">Workout Session Timer</p>
+            <p class="timer-time" id="followSessionTimer">00:00</p>
+          </div>
+          <div class="timer-wrap">
+            <p class="timer-label">Exercise Counter</p>
+            <p class="timer-time" id="followExerciseTimer">00:00</p>
+          </div>
+          <div class="timer-wrap">
+            <p class="timer-label">Rest Timer</p>
+            <p class="timer-time" id="followTimer">01:15</p>
+            <div class="timer-controls">
+              <button class="btn" id="followTimerStart">Start Rest</button>
+              <button class="btn secondary" id="followTimerAdd">+15s</button>
+              <button class="btn secondary" id="followTimerReset">Reset</button>
+            </div>
           </div>
         </div>
 
@@ -890,7 +934,13 @@
       exIndex: 0,
       restDefault: 75,
       restLeft: 75,
-      restTimer: null
+      restTimer: null,
+      exerciseElapsed: 0,
+      exerciseTimer: null,
+      sessionElapsed: 0,
+      sessionTimer: null,
+      timedLeft: 0,
+      timedTimer: null
     };
     let effortHistory = [];
 
@@ -1123,6 +1173,10 @@
       const mm = String(Math.floor(s / 60)).padStart(2, "0");
       const ss = String(s % 60).padStart(2, "0");
       return `${mm}:${ss}`;
+    }
+
+    function isFollowModeOpen() {
+      return document.getElementById("focusMode")?.classList.contains("active");
     }
 
     function getRowField(dayId, idx, field) {
@@ -1407,6 +1461,7 @@
 
       const [exercise, target] = day.exercises[followSession.exIndex];
       const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${exercise} exercise proper form`)}`;
+      const timed = isTimedExercise(exercise, target);
 
       document.getElementById("followDay").value = String(followSession.dayIndex);
       document.getElementById("followDayName").textContent = day.name;
@@ -1416,12 +1471,126 @@
       document.getElementById("followVideo").href = videoUrl;
 
       syncFollowFromTable();
+      document.getElementById("followTimedTimerWrap").style.display = timed ? "block" : "none";
+
+      if (isFollowModeOpen()) {
+        resetExerciseTimer(true);
+        if (timed) {
+          resetTimedCountdown();
+        } else {
+          stopTimedCountdown();
+          followSession.timedLeft = 0;
+          updateTimedCountdown();
+        }
+      }
+
       persistFollowState();
       updateExerciseRowVisualStates();
     }
 
     function updateFollowTimer() {
       document.getElementById("followTimer").textContent = formatTimer(followSession.restLeft);
+    }
+
+    function updateExerciseTimer() {
+      document.getElementById("followExerciseTimer").textContent = formatTimer(followSession.exerciseElapsed);
+    }
+
+    function stopExerciseTimer() {
+      if (followSession.exerciseTimer) {
+        clearInterval(followSession.exerciseTimer);
+        followSession.exerciseTimer = null;
+      }
+    }
+
+    function startExerciseTimer() {
+      if (followSession.exerciseTimer) return;
+      followSession.exerciseTimer = setInterval(() => {
+        followSession.exerciseElapsed += 1;
+        updateExerciseTimer();
+      }, 1000);
+    }
+
+    function resetExerciseTimer(start = false) {
+      stopExerciseTimer();
+      followSession.exerciseElapsed = 0;
+      updateExerciseTimer();
+      if (start) startExerciseTimer();
+    }
+
+    function updateSessionTimer() {
+      document.getElementById("followSessionTimer").textContent = formatTimer(followSession.sessionElapsed);
+    }
+
+    function stopSessionTimer() {
+      if (followSession.sessionTimer) {
+        clearInterval(followSession.sessionTimer);
+        followSession.sessionTimer = null;
+      }
+    }
+
+    function startSessionTimer() {
+      if (followSession.sessionTimer) return;
+      followSession.sessionTimer = setInterval(() => {
+        followSession.sessionElapsed += 1;
+        updateSessionTimer();
+      }, 1000);
+    }
+
+    function resetSessionTimer(start = false) {
+      stopSessionTimer();
+      followSession.sessionElapsed = 0;
+      updateSessionTimer();
+      if (start) startSessionTimer();
+    }
+
+    function getCurrentTimedDurationSeconds() {
+      const { target } = getActiveExerciseMeta();
+      const fromInput = parseMinutesFromText(document.getElementById("followDurationMin").value);
+      const fallback = parseMinutesFromText(target);
+      const mins = clamp(fromInput || fallback || 0, 0, 180);
+      return mins * 60;
+    }
+
+    function updateTimedCountdown() {
+      document.getElementById("followTimedTimer").textContent = formatTimer(followSession.timedLeft);
+    }
+
+    function stopTimedCountdown() {
+      if (followSession.timedTimer) {
+        clearInterval(followSession.timedTimer);
+        followSession.timedTimer = null;
+      }
+      document.getElementById("followTimedStart").textContent = "Start";
+    }
+
+    function resetTimedCountdown() {
+      stopTimedCountdown();
+      followSession.timedLeft = getCurrentTimedDurationSeconds();
+      updateTimedCountdown();
+    }
+
+    function toggleTimedCountdown() {
+      if (followSession.timedTimer) {
+        stopTimedCountdown();
+        return;
+      }
+
+      if (followSession.timedLeft <= 0) {
+        resetTimedCountdown();
+      }
+      if (followSession.timedLeft <= 0) return;
+
+      document.getElementById("followTimedStart").textContent = "Pause";
+      followSession.timedTimer = setInterval(() => {
+        followSession.timedLeft -= 1;
+        if (followSession.timedLeft <= 0) {
+          followSession.timedLeft = 0;
+          stopTimedCountdown();
+          if (navigator.vibrate) navigator.vibrate([160, 80, 160]);
+        }
+        updateTimedCountdown();
+      }, 1000);
     }
 
     function stopFollowTimer() {
@@ -1466,12 +1635,16 @@
       document.getElementById("focusMode").classList.add("active");
       document.getElementById("focusMode").setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
+      resetSessionTimer(true);
       renderFollowStep();
       resetFollowTimer();
     }
 
     function closeFollowMode() {
       stopFollowTimer();
+      stopExerciseTimer();
+      stopSessionTimer();
+      stopTimedCountdown();
       syncTableFromFollow();
       document.getElementById("focusMode").classList.remove("active");
       document.getElementById("focusMode").setAttribute("aria-hidden", "true");
@@ -1491,6 +1664,7 @@
       const next = followSession.exIndex + direction;
       if (next >= 0 && next < day.exercises.length) {
         followSession.exIndex = next;
+        resetFollowTimer();
         renderFollowStep();
         return;
       }
@@ -1809,19 +1983,29 @@
         updateFollowTimer();
       });
       document.getElementById("followTimerReset").addEventListener("click", resetFollowTimer);
+      document.getElementById("followTimedStart").addEventListener("click", toggleTimedCountdown);
+      document.getElementById("followTimedAdd").addEventListener("click", () => {
+        followSession.timedLeft = clamp(followSession.timedLeft + 60, 0, 4 * 60 * 60);
+        updateTimedCountdown();
+      });
+      document.getElementById("followTimedReset").addEventListener("click", resetTimedCountdown);
       document.getElementById("followAddSet").addEventListener("click", addFollowSet);
       document.getElementById("followRemoveSet").addEventListener("click", removeFollowSet);
 
       ["followPain", "followNotes"].forEach(id => {
         document.getElementById(id).addEventListener("input", () => syncTableFromFollow());
       });
-      document.getElementById("followDurationMin").addEventListener("input", () => syncTableFromFollow());
+      document.getElementById("followDurationMin").addEventListener("input", () => {
+        syncTableFromFollow();
+        resetTimedCountdown();
+      });
       document.getElementById("followTimedBlock").addEventListener("click", e => {
         const btn = e.target.closest("button[data-duration]");
         if (!btn) return;
         e.preventDefault();
         document.getElementById("followDurationMin").value = btn.dataset.duration || "";
         syncTableFromFollow();
+        resetTimedCountdown();
       });
       document.getElementById("followSetsList").addEventListener("input", () => syncTableFromFollow());
       document.getElementById("followSetsList").addEventListener("change", () => syncTableFromFollow());
@@ -1852,6 +2036,10 @@
       loadEffortHistory();
       renderEffortDashboard();
       resetFollowTimer();
+      resetSessionTimer();
+      resetExerciseTimer();
+      followSession.timedLeft = 0;
+      updateTimedCountdown();
       renderFollowStep();
       const effortIdx = plan.findIndex(day => day.id === document.getElementById("effortDay").value);
       if (effortIdx >= 0 && !document.getElementById("effortTotalMin").value) {
