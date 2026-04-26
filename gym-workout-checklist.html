@@ -539,7 +539,7 @@
 
     .follow-set-row {
       display: grid;
-      grid-template-columns: 70px 1fr 1fr 82px;
+      grid-template-columns: 1fr auto;
       gap: 8px;
       align-items: center;
       border: 1px solid #d7e6f3;
@@ -565,6 +565,17 @@
       font-size: 0.82rem;
       color: #2b4e6b;
       font-weight: 700;
+    }
+
+    .set-status {
+      font-size: 0.8rem;
+      color: #3c617c;
+      grid-column: 1 / 2;
+    }
+
+    .follow-set-row .btn {
+      width: auto;
+      min-width: 130px;
     }
 
     .set-check {
@@ -607,6 +618,32 @@
       grid-template-columns: 1fr;
       gap: 8px;
       margin-top: 10px;
+    }
+
+    .follow-rest-stage {
+      position: fixed;
+      inset: 0;
+      z-index: 130;
+      background: rgba(8, 23, 35, 0.88);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 12px;
+      padding: 20px;
+    }
+
+    .follow-rest-stage .timer-label {
+      color: #d7ebf8;
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    .timer-time.rest-big {
+      font-size: clamp(3rem, 12vw, 5.4rem);
+      color: #ffffff;
+      margin: 0;
     }
 
     .follow-transition {
@@ -823,7 +860,7 @@
       }
 
       .follow-set-row {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
       }
 
       .set-tag {
@@ -1077,7 +1114,6 @@
         <div class="follow-kicker">
           <div class="pill" id="followProgress">Exercise 1/1</div>
           <div class="pill" id="followDoneState">Pending</div>
-          <div class="pill" id="followPainBadge">Pain: -</div>
         </div>
         <h3 class="follow-exercise" id="followExercise">Exercise</h3>
         <p class="follow-target" id="followTarget">3 x 10</p>
@@ -1086,61 +1122,24 @@
 
         <div class="follow-grid">
           <div class="full" id="followSetBlock">
-            <label>Set Tracking</label>
+            <label>Sets</label>
             <div id="followSetsList" class="follow-sets"></div>
-            <div class="set-buttons">
-              <button class="btn secondary" id="followAddSet">+ Add Set</button>
-              <button class="btn secondary" id="followRemoveSet">Remove Last</button>
-            </div>
-          </div>
-          <div class="full" id="followTimedBlock" style="display:none;">
-            <label for="followDurationMin">Duration (min)</label>
-            <input type="number" id="followDurationMin" min="1" max="180" step="1" placeholder="e.g., 12" />
-            <div class="set-buttons">
-              <button class="btn secondary" data-duration="5">5 min</button>
-              <button class="btn secondary" data-duration="10">10 min</button>
-              <button class="btn secondary" data-duration="12">12 min</button>
-              <button class="btn secondary" data-duration="15">15 min</button>
-            </div>
-            <div class="timer-wrap" id="followTimedTimerWrap">
-              <p class="timer-label">Timed Exercise Countdown</p>
-              <p class="timer-time slim" id="followTimedTimer">00:00</p>
-              <div class="timer-controls">
-                <button class="btn" id="followTimedStart">Start</button>
-                <button class="btn secondary" id="followTimedAdd">+1 min</button>
-                <button class="btn secondary" id="followTimedReset">Reset</button>
-              </div>
-            </div>
-          </div>
-          <div>
-            <label for="followPain">Pain (0-10)</label>
-            <input type="number" class="pain" min="0" max="10" inputmode="numeric" id="followPain" placeholder="0-10" />
-          </div>
-          <div class="full">
-            <label for="followNotes">Notes</label>
-            <textarea id="followNotes" placeholder="cues, tempo, RIR..."></textarea>
           </div>
         </div>
 
         <div class="timer-stack">
           <div class="timer-wrap">
-            <p class="timer-label">Exercise Counter</p>
+            <p class="timer-label">Set Timer</p>
             <p class="timer-time" id="followExerciseTimer">00:00</p>
-          </div>
-          <div class="timer-wrap">
-            <p class="timer-label">Rest Timer</p>
-            <p class="timer-time" id="followTimer">01:15</p>
-            <div class="timer-controls">
-              <button class="btn" id="followTimerStart">Start Rest</button>
-              <button class="btn secondary" id="followTimerAdd">+15s</button>
-              <button class="btn secondary" id="followTimerReset">Reset</button>
-            </div>
           </div>
         </div>
 
-        <div class="follow-actions" id="followPrimaryActions">
-          <button class="btn" id="followDoneNext">Complete</button>
+        <div class="follow-rest-stage" id="followRestStage" style="display:none;">
+          <p class="timer-label">Rest</p>
+          <p class="timer-time rest-big" id="followTimer">01:15</p>
+          <button class="btn" id="followRestNext" disabled>Resting...</button>
         </div>
+
         <div class="follow-transition" id="followTransition" style="display:none;">
           <div class="transition-check" aria-hidden="true">✓</div>
           <p id="followTransitionText">Completed! Ready for next exercise.</p>
@@ -1582,41 +1581,36 @@
         .replaceAll("'", "&#39;");
     }
 
+    function nextIncompleteSetIndex(sets) {
+      return sets.findIndex(set => !set.done);
+    }
+
     function renderFollowSets(sets) {
       const host = document.getElementById("followSetsList");
-      host.innerHTML = sets.map((set, idx) => `
-        <div class="follow-set-row" data-set-index="${idx}">
-          <div class="set-tag">Set ${idx + 1}</div>
-          <input type="text" inputmode="decimal" data-set-field="weight" value="${escapeHtml(set.weight)}" placeholder="Weight" />
-          <input type="number" min="0" max="200" step="1" inputmode="numeric" data-set-field="reps" value="${escapeHtml(set.reps)}" placeholder="Reps" />
-          <label class="set-check"><input type="checkbox" data-set-field="done" ${set.done ? "checked" : ""} />Done</label>
-        </div>
-      `).join("");
-      updateFollowSetVisualStates();
+      const nextIdx = nextIncompleteSetIndex(sets);
+      host.innerHTML = sets.map((set, idx) => {
+        const done = Boolean(set.done);
+        const active = !done && idx === nextIdx;
+        return `
+          <div class="follow-set-row ${done ? "set-done" : ""} ${active ? "set-active" : ""}" data-set-index="${idx}" data-set-done="${done ? "1" : "0"}">
+            <div class="set-tag">Set ${idx + 1}</div>
+            <div class="set-status">${done ? "Completed ✓" : active ? "Ready" : "Waiting"}</div>
+            <button class="btn ${done ? "secondary" : ""}" data-set-complete="${idx}" ${done || !active ? "disabled" : ""}>${done ? "Completed" : "Complete Set"}</button>
+          </div>
+        `;
+      }).join("");
     }
 
     function updateFollowSetVisualStates() {
-      const rows = Array.from(document.querySelectorAll("#followSetsList .follow-set-row"));
-      if (!rows.length) return;
-
-      rows.forEach(row => row.classList.remove("set-done", "set-active"));
-
-      rows.forEach(row => {
-        const done = row.querySelector('[data-set-field="done"]')?.checked;
-        if (done) row.classList.add("set-done");
-      });
-
-      let activeRow = rows.find(row => !row.querySelector('[data-set-field="done"]')?.checked);
-      if (!activeRow) activeRow = rows[rows.length - 1];
-      activeRow.classList.add("set-active");
+      renderFollowSets(readFollowSetsFromUi());
     }
 
     function readFollowSetsFromUi() {
       return sanitizeSets(
         Array.from(document.querySelectorAll("#followSetsList .follow-set-row")).map(row => ({
-          weight: row.querySelector('[data-set-field="weight"]')?.value || "",
-          reps: row.querySelector('[data-set-field="reps"]')?.value || "",
-          done: Boolean(row.querySelector('[data-set-field="done"]')?.checked)
+          weight: "",
+          reps: "",
+          done: row.dataset.setDone === "1"
         }))
       );
     }
@@ -1643,64 +1637,25 @@
       document.getElementById("followDoneState").textContent = doneEl?.checked ? "Completed" : "Pending";
     }
 
-    function updateFollowPainBadge() {
-      const value = document.getElementById("followPain").value;
-      document.getElementById("followPainBadge").textContent = `Pain: ${value === "" ? "-" : value}`;
-    }
+    function updateFollowPainBadge() {}
 
     function syncFollowFromTable() {
-      const { day, exercise, target } = getActiveExerciseMeta();
-      const timed = isTimedExercise(exercise, target);
-      document.getElementById("followSetBlock").style.display = timed ? "none" : "block";
-      document.getElementById("followTimedBlock").style.display = timed ? "block" : "none";
-
-      if (timed) {
-        const repsValue = getRowField(day.id, followSession.exIndex, "reps")?.value || "";
-        const mins = parseMinutesFromText(repsValue) || parseMinutesFromText(target) || "";
-        document.getElementById("followDurationMin").value = mins ? String(mins) : "";
-      } else {
-        const sets = ensureFollowSetsInitialized(day, target);
-        renderFollowSets(sets);
-      }
-      document.getElementById("followPain").value = getRowField(day.id, followSession.exIndex, "pain")?.value || "";
-      document.getElementById("followNotes").value = getRowField(day.id, followSession.exIndex, "notes")?.value || "";
-      updateFollowPainBadge();
+      const { day, target } = getActiveExerciseMeta();
+      const sets = ensureFollowSetsInitialized(day, target);
+      renderFollowSets(sets);
       updateFollowDoneState();
     }
 
     function syncTableFromFollow(save = true) {
-      const { day, exercise, target } = getActiveExerciseMeta();
-      const timed = isTimedExercise(exercise, target);
+      const { day } = getActiveExerciseMeta();
+      const sets = writeSetsToRow(day.id, followSession.exIndex, readFollowSetsFromUi());
+      updateFollowSetVisualStates();
 
-      if (timed) {
-        const durationVal = document.getElementById("followDurationMin").value || "";
-        const duration = parseMinutesFromText(durationVal);
-        const weightField = getRowField(day.id, followSession.exIndex, "weight");
-        if (weightField) weightField.value = "";
-        const repsField = getRowField(day.id, followSession.exIndex, "reps");
-        if (repsField) repsField.value = duration ? String(duration) : "";
-        writeSetsToRow(day.id, followSession.exIndex, []);
-      } else {
-        const sets = writeSetsToRow(day.id, followSession.exIndex, readFollowSetsFromUi());
-        updateFollowSetVisualStates();
-        const loggedSets = sets.filter(s => s.done || s.weight || s.reps);
-        const lastWeight = [...loggedSets].reverse().find(s => s.weight)?.weight || "";
-        const lastReps = [...loggedSets].reverse().find(s => s.reps)?.reps || "";
-
-        const weightField = getRowField(day.id, followSession.exIndex, "weight");
-        if (weightField) weightField.value = lastWeight;
-        const repsField = getRowField(day.id, followSession.exIndex, "reps");
-        if (repsField) repsField.value = lastReps;
-      }
-
-      const painField = getRowField(day.id, followSession.exIndex, "pain");
-      if (painField) painField.value = document.getElementById("followPain").value;
-      const notesField = getRowField(day.id, followSession.exIndex, "notes");
-      if (notesField) notesField.value = document.getElementById("followNotes").value;
-
-      const pain = Number(document.getElementById("followPain").value);
-      document.getElementById("followPain").classList.toggle("high", Number.isFinite(pain) && pain >= 4);
-      updateFollowPainBadge();
+      const doneCount = sets.filter(s => s.done).length;
+      const repsField = getRowField(day.id, followSession.exIndex, "reps");
+      if (repsField) repsField.value = doneCount ? String(doneCount) : "";
+      const weightField = getRowField(day.id, followSession.exIndex, "weight");
+      if (weightField) weightField.value = "";
 
       if (save) saveState();
     }
@@ -1775,10 +1730,52 @@
       const primary = document.getElementById("followPrimaryActions");
       const actionBtn = document.getElementById("followTransitionNext");
       box.style.display = followTransitionPending ? "block" : "none";
-      primary.style.display = followTransitionPending ? "none" : "grid";
+      if (primary) primary.style.display = followTransitionPending ? "none" : "grid";
       text.textContent = message;
       actionBtn.textContent = action === "save" ? "Save Session" : "Next";
       updateSessionControlButtons();
+    }
+
+    function openRestStage() {
+      const stage = document.getElementById("followRestStage");
+      const nextBtn = document.getElementById("followRestNext");
+      resetFollowTimer();
+      stopFollowTimer();
+      stage.style.display = "flex";
+      nextBtn.disabled = true;
+      nextBtn.textContent = "Resting...";
+      followSession.restTimer = setInterval(() => {
+        followSession.restLeft -= 1;
+        if (followSession.restLeft <= 0) {
+          followSession.restLeft = 0;
+          stopFollowTimer();
+          nextBtn.disabled = false;
+          nextBtn.textContent = "Next";
+          if (navigator.vibrate) navigator.vibrate([120, 80, 120]);
+        }
+        updateFollowTimer();
+      }, 1000);
+    }
+
+    function closeRestStage() {
+      const stage = document.getElementById("followRestStage");
+      stage.style.display = "none";
+      stopFollowTimer();
+    }
+
+    function completeSetFromExercise(setIndex) {
+      const { day, target } = getActiveExerciseMeta();
+      const sets = ensureFollowSetsInitialized(day, target);
+      const activeIdx = nextIncompleteSetIndex(sets);
+      if (activeIdx < 0 || setIndex !== activeIdx) return;
+
+      sets[setIndex].done = true;
+      writeSetsToRow(day.id, followSession.exIndex, sets);
+      renderFollowSets(sets);
+      syncTableFromFollow();
+
+      stopExerciseTimer();
+      openRestStage();
     }
 
     function completeCurrentExercise() {
@@ -1789,12 +1786,10 @@
 
       syncTableFromFollow();
       updateSummary();
+      updateFollowDoneState();
 
       stopExerciseTimer();
-      stopTimedCountdown();
-      resetFollowTimer();
-      followSession.running = false;
-      updateSessionControlButtons();
+      closeRestStage();
 
       const isLastExercise = followSession.exIndex >= day.exercises.length - 1;
       if (isLastExercise) {
@@ -1816,6 +1811,20 @@
       moveFollowStep({ direction: 1 });
     }
 
+    function handleRestNext() {
+      const nextBtn = document.getElementById("followRestNext");
+      if (nextBtn.disabled) return;
+      closeRestStage();
+      const { day } = getActiveExerciseMeta();
+      const sets = readSetsFromRow(day.id, followSession.exIndex);
+      if (sets.some(set => !set.done)) {
+        renderFollowSets(sets);
+        resetExerciseTimer(followSession.started && followSession.running);
+        return;
+      }
+      completeCurrentExercise();
+    }
+
     function renderFollowStep() {
       followSession.dayIndex = clamp(followSession.dayIndex, 0, plan.length - 1);
       const day = plan[followSession.dayIndex];
@@ -1824,7 +1833,6 @@
       const [exercise, target] = day.exercises[followSession.exIndex];
       const nextTuple = day.exercises[followSession.exIndex + 1] || null;
       const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${exercise} exercise proper form`)}`;
-      const timed = isTimedExercise(exercise, target);
 
       document.getElementById("followDay").value = String(followSession.dayIndex);
       document.getElementById("followDayName").textContent = day.name;
@@ -1836,19 +1844,12 @@
         : "Up next: Workout complete";
       document.getElementById("followVideo").href = videoUrl;
       setFollowTransition(false);
+      closeRestStage();
 
       syncFollowFromTable();
-      document.getElementById("followTimedTimerWrap").style.display = timed ? "block" : "none";
 
       if (isFollowModeOpen()) {
         resetExerciseTimer(followSession.started && followSession.running);
-        if (timed) {
-          resetTimedCountdown();
-        } else {
-          stopTimedCountdown();
-          followSession.timedLeft = 0;
-          updateTimedCountdown();
-        }
       }
 
       persistFollowState();
@@ -1856,7 +1857,8 @@
     }
 
     function updateFollowTimer() {
-      document.getElementById("followTimer").textContent = formatTimer(followSession.restLeft);
+      const el = document.getElementById("followTimer");
+      if (el) el.textContent = formatTimer(followSession.restLeft);
     }
 
     function updateExerciseTimer() {
@@ -1941,14 +1943,16 @@
 
     function getCurrentTimedDurationSeconds() {
       const { target } = getActiveExerciseMeta();
-      const fromInput = parseMinutesFromText(document.getElementById("followDurationMin").value);
+      const durationInput = document.getElementById("followDurationMin");
+      const fromInput = parseMinutesFromText(durationInput ? durationInput.value : "");
       const fallback = parseMinutesFromText(target);
       const mins = clamp(fromInput || fallback || 0, 0, 180);
       return mins * 60;
     }
 
     function updateTimedCountdown() {
-      document.getElementById("followTimedTimer").textContent = formatTimer(followSession.timedLeft);
+      const el = document.getElementById("followTimedTimer");
+      if (el) el.textContent = formatTimer(followSession.timedLeft);
     }
 
     function stopTimedCountdown() {
@@ -1956,7 +1960,8 @@
         clearInterval(followSession.timedTimer);
         followSession.timedTimer = null;
       }
-      document.getElementById("followTimedStart").textContent = "Start";
+      const startBtn = document.getElementById("followTimedStart");
+      if (startBtn) startBtn.textContent = "Start";
     }
 
     function resetTimedCountdown() {
@@ -1977,7 +1982,8 @@
       }
       if (followSession.timedLeft <= 0) return;
 
-      document.getElementById("followTimedStart").textContent = "Pause";
+      const startBtn = document.getElementById("followTimedStart");
+      if (startBtn) startBtn.textContent = "Pause";
       followSession.timedTimer = setInterval(() => {
         followSession.timedLeft -= 1;
         if (followSession.timedLeft <= 0) {
@@ -1994,7 +2000,8 @@
         clearInterval(followSession.restTimer);
         followSession.restTimer = null;
       }
-      document.getElementById("followTimerStart").textContent = "Start Rest";
+      const startBtn = document.getElementById("followTimerStart");
+      if (startBtn) startBtn.textContent = "Start Rest";
     }
 
     function resetFollowTimer() {
@@ -2025,7 +2032,8 @@
         followSession.restLeft = followSession.restDefault;
       }
 
-      document.getElementById("followTimerStart").textContent = "Pause";
+      const startBtn = document.getElementById("followTimerStart");
+      if (startBtn) startBtn.textContent = "Pause";
       followSession.restTimer = setInterval(() => {
         followSession.restLeft -= 1;
         if (followSession.restLeft <= 0) {
@@ -2054,6 +2062,7 @@
 
     function closeFollowMode() {
       stopFollowTimer();
+      closeRestStage();
       stopExerciseTimer();
       stopSessionTimer();
       stopTimedCountdown();
@@ -2072,6 +2081,7 @@
     function moveFollowStep({ markDone = false, direction = 1 } = {}) {
       const { day } = getActiveExerciseMeta();
       setFollowTransition(false);
+      closeRestStage();
       if (markDone) {
         const doneEl = getRowField(day.id, followSession.exIndex, "done");
         if (doneEl) doneEl.checked = true;
@@ -2586,8 +2596,16 @@
       });
       document.getElementById("followPauseMain").addEventListener("click", pauseFollowSession);
       document.getElementById("followStopMain").addEventListener("click", stopFollowSession);
-      document.getElementById("followDoneNext").addEventListener("click", completeCurrentExercise);
       document.getElementById("followTransitionNext").addEventListener("click", handleTransitionPrimaryAction);
+      document.getElementById("followRestNext").addEventListener("click", handleRestNext);
+      document.getElementById("followSetsList").addEventListener("click", e => {
+        const btn = e.target.closest("button[data-set-complete]");
+        if (!btn) return;
+        e.preventDefault();
+        const idx = Number(btn.dataset.setComplete);
+        if (!Number.isFinite(idx)) return;
+        completeSetFromExercise(idx);
+      });
 
       document.getElementById("followDay").addEventListener("change", e => {
         followSession.dayIndex = clamp(Number(e.target.value) || 0, 0, plan.length - 1);
@@ -2596,41 +2614,9 @@
       });
 
       document.getElementById("followRest").addEventListener("change", resetFollowTimer);
-      document.getElementById("followTimerStart").addEventListener("click", toggleFollowTimer);
-      document.getElementById("followTimerAdd").addEventListener("click", () => {
-        followSession.restLeft = clamp(followSession.restLeft + 15, 0, 1800);
-        updateFollowTimer();
-      });
-      document.getElementById("followTimerReset").addEventListener("click", resetFollowTimer);
       document.getElementById("followSessionStart").addEventListener("click", startFollowSession);
       document.getElementById("followSessionPause").addEventListener("click", pauseFollowSession);
       document.getElementById("followSessionStop").addEventListener("click", stopFollowSession);
-      document.getElementById("followTimedStart").addEventListener("click", toggleTimedCountdown);
-      document.getElementById("followTimedAdd").addEventListener("click", () => {
-        followSession.timedLeft = clamp(followSession.timedLeft + 60, 0, 4 * 60 * 60);
-        updateTimedCountdown();
-      });
-      document.getElementById("followTimedReset").addEventListener("click", resetTimedCountdown);
-      document.getElementById("followAddSet").addEventListener("click", addFollowSet);
-      document.getElementById("followRemoveSet").addEventListener("click", removeFollowSet);
-
-      ["followPain", "followNotes"].forEach(id => {
-        document.getElementById(id).addEventListener("input", () => syncTableFromFollow());
-      });
-      document.getElementById("followDurationMin").addEventListener("input", () => {
-        syncTableFromFollow();
-        resetTimedCountdown();
-      });
-      document.getElementById("followTimedBlock").addEventListener("click", e => {
-        const btn = e.target.closest("button[data-duration]");
-        if (!btn) return;
-        e.preventDefault();
-        document.getElementById("followDurationMin").value = btn.dataset.duration || "";
-        syncTableFromFollow();
-        resetTimedCountdown();
-      });
-      document.getElementById("followSetsList").addEventListener("input", () => syncTableFromFollow());
-      document.getElementById("followSetsList").addEventListener("change", () => syncTableFromFollow());
 
       document.body.addEventListener("input", e => {
         const t = e.target;
