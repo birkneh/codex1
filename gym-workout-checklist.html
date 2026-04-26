@@ -1742,14 +1742,13 @@
       resetFollowTimer();
       stopFollowTimer();
       stage.style.display = "flex";
-      nextBtn.disabled = true;
-      nextBtn.textContent = "Resting...";
+      nextBtn.disabled = false;
+      nextBtn.textContent = "Stop Rest";
       followSession.restTimer = setInterval(() => {
         followSession.restLeft -= 1;
         if (followSession.restLeft <= 0) {
           followSession.restLeft = 0;
           stopFollowTimer();
-          nextBtn.disabled = false;
           nextBtn.textContent = "Next";
           if (navigator.vibrate) navigator.vibrate([120, 80, 120]);
         }
@@ -1813,7 +1812,13 @@
 
     function handleRestNext() {
       const nextBtn = document.getElementById("followRestNext");
-      if (nextBtn.disabled) return;
+      if (followSession.restTimer) {
+        stopFollowTimer();
+        followSession.restLeft = 0;
+        updateFollowTimer();
+        nextBtn.textContent = "Next";
+        return;
+      }
       closeRestStage();
       const { day } = getActiveExerciseMeta();
       const sets = readSetsFromRow(day.id, followSession.exIndex);
