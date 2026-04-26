@@ -779,13 +779,17 @@
         <a class="video-link" id="followVideo" href="#" target="_blank" rel="noopener noreferrer">Open video</a>
 
         <div class="follow-grid">
-          <div class="full">
+          <div class="full" id="followSetBlock">
             <label>Set Tracking</label>
             <div id="followSetsList" class="follow-sets"></div>
             <div class="set-buttons">
               <button class="btn secondary" id="followAddSet">+ Add Set</button>
               <button class="btn secondary" id="followRemoveSet">Remove Last</button>
             </div>
+          </div>
+          <div class="full" id="followTimedBlock" style="display:none;">
+            <label for="followDurationMin">Duration (min)</label>
+            <input type="number" id="followDurationMin" min="1" max="180" step="1" placeholder="e.g., 12" />
           </div>
           <div>
             <label for="followPain">Pain (0-10)</label>
@@ -1007,6 +1011,8 @@
         <div class="pill">Major muscle groups touched 2x/week</div>
       `;
 
+      refreshAllSetSummaries();
+
       document.querySelectorAll(".pain").forEach(el => {
         const v = Number(el.value);
         el.classList.toggle("high", Number.isFinite(v) && v >= 4);
@@ -1120,6 +1126,17 @@
       return 3;
     }
 
+    function isTimedExercise(exercise, target) {
+      const blob = `${exercise || ""} ${target || ""}`.toLowerCase();
+      return blob.includes("cardio warm-up") || blob.includes("stretching") || /\bmin\b/.test(blob);
+    }
+
+    function getExerciseMetaByIds(dayId, idx) {
+      const day = plan.find(item => item.id === dayId);
+      if (!day || !day.exercises[idx]) return null;
+      return { day, exercise: day.exercises[idx][0], target: day.exercises[idx][1] };
+    }
+
     function sanitizeSets(sets) {
       if (!Array.isArray(sets)) return [];
       return sets.map(set => ({
@@ -1150,6 +1167,13 @@
       const key = getSetsKey(dayId, idx);
       const target = document.querySelector(`[data-set-summary="${key}"]`);
       if (!target) return;
+      const meta = getExerciseMetaByIds(dayId, idx);
+      if (meta && isTimedExercise(meta.exercise, meta.target)) {
+        const repsValue = getRowField(dayId, idx, "reps")?.value || "";
+        const duration = parseMinutesFromText(repsValue);
+        target.textContent = duration ? `Duration: ${duration} min` : `Duration: ${meta.target}`;
+        return;
+      }
       target.textContent = summarizeSets(readSetsFromRow(dayId, idx));
     }
 
@@ -1263,26 +1287,49 @@
     }
 
     function syncFollowFromTable() {
-      const { day, target } = getActiveExerciseMeta();
-      const sets = ensureFollowSetsInitialized(day, target);
-      renderFollowSets(sets);
+      const { day, exercise, target } = getActiveExerciseMeta();
+      const timed = isTimedExercise(exercise, target);
+      document.getElementById("followSetBlock").style.display = timed ? "none" : "block";
+      document.getElementById("followTimedBlock").style.display = timed ? "block" : "none";
+
+      if (timed) {
+        const repsValue = getRowField(day.id, followSession.exIndex, "reps")?.value || "";
+        const mins = parseMinutesFromText(repsValue) || parseMinutesFromText(target) || "";
+        document.getElementById("followDurationMin").value = mins ? String(mins) : "";
+      } else {
+        const sets = ensureFollowSetsInitialized(day, target);
+        renderFollowSets(sets);
+      }
       document.getElementById("followPain").value = getRowField(day.id, followSession.exIndex, "pain")?.value || "";
       document.getElementById("followNotes").value = getRowField(day.id, followSession.exIndex, "notes")?.value || "";
       updateFollowDoneState();
     }
 
     function syncTableFromFollow(save = true) {
-      const { day } = getActiveExerciseMeta();
-      const sets = writeSetsToRow(day.id, followSession.exIndex, readFollowSetsFromUi());
-      updateFollowSetVisualStates();
-      const loggedSets = sets.filter(s => s.done || s.weight || s.reps);
-      const lastWeight = [...loggedSets].reverse().find(s => s.weight)?.weight || "";
-      const repsCsv = loggedSets.map(s => s.reps).filter(Boolean).join(",");
+      const { day, exercise, target } = getActiveExerciseMeta();
+      const timed = isTimedExercise(exercise, target);
 
-      const weightField = getRowField(day.id, followSession.exIndex, "weight");
-      if (weightField) weightField.value = lastWeight;
-      const repsField = getRowField(day.id, followSession.exIndex, "reps");
-      if (repsField) repsField.value = repsCsv;
+      if (timed) {
+        const durationVal = document.getElementById("followDurationMin").value || "";
+        const duration = parseMinutesFromText(durationVal);
+        const weightField = getRowField(day.id, followSession.exIndex, "weight");
+        if (weightField) weightField.value = "";
+        const repsField = getRowField(day.id, followSession.exIndex, "reps");
+        if (repsField) repsField.value = duration ? String(duration) : "";
+        writeSetsToRow(day.id, followSession.exIndex, []);
+      } else {
+        const sets = writeSetsToRow(day.id, followSession.exIndex, readFollowSetsFromUi());
+        updateFollowSetVisualStates();
+        const loggedSets = sets.filter(s => s.done || s.weight || s.reps);
+        const lastWeight = [...loggedSets].reverse().find(s => s.weight)?.weight || "";
+        const repsCsv = loggedSets.map(s => s.reps).filter(Boolean).join(",");
+
+        const weightField = getRowField(day.id, followSession.exIndex, "weight");
+        if (weightField) weightField.value = lastWeight;
+        const repsField = getRowField(day.id, followSession.exIndex, "reps");
+        if (repsField) repsField.value = repsCsv;
+      }
+
       const painField = getRowField(day.id, followSession.exIndex, "pain");
       if (painField) painField.value = document.getElementById("followPain").value;
       const notesField = getRowField(day.id, followSession.exIndex, "notes");
@@ -1436,6 +1483,8 @@
     }
 
     function addFollowSet() {
+      const { exercise, target } = getActiveExerciseMeta();
+      if (isTimedExercise(exercise, target)) return;
       const sets = readFollowSetsFromUi();
       sets.push({ weight: "", reps: "", done: false });
       renderFollowSets(sets);
@@ -1443,6 +1492,8 @@
     }
 
     function removeFollowSet() {
+      const { exercise, target } = getActiveExerciseMeta();
+      if (isTimedExercise(exercise, target)) return;
       const sets = readFollowSetsFromUi();
       if (sets.length <= 1) return;
       sets.pop();
@@ -1518,13 +1569,13 @@
         const lowerName = String(name).toLowerCase();
 
         if (lowerName.includes("cardio warm-up")) {
-          const entered = parseMinutesFromText(sets.find(s => s.reps)?.reps || "");
+          const entered = parseMinutesFromText(getRowField(day.id, idx, "reps")?.value || "") || parseMinutesFromText(sets.find(s => s.reps)?.reps || "");
           total += entered || parseMinutesFromText(target) || 12;
           return;
         }
 
         if (lowerName.includes("stretching")) {
-          const entered = parseMinutesFromText(sets.find(s => s.reps)?.reps || "");
+          const entered = parseMinutesFromText(getRowField(day.id, idx, "reps")?.value || "") || parseMinutesFromText(sets.find(s => s.reps)?.reps || "");
           total += entered || parseMinutesFromText(target) || 5;
           return;
         }
@@ -1743,6 +1794,7 @@
       ["followPain", "followNotes"].forEach(id => {
         document.getElementById(id).addEventListener("input", () => syncTableFromFollow());
       });
+      document.getElementById("followDurationMin").addEventListener("input", () => syncTableFromFollow());
       document.getElementById("followSetsList").addEventListener("input", () => syncTableFromFollow());
       document.getElementById("followSetsList").addEventListener("change", () => syncTableFromFollow());
 
