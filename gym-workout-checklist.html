@@ -74,7 +74,7 @@
 
     .tab-switch {
       display: grid;
-      grid-template-columns: repeat(2, minmax(130px, 180px));
+      grid-template-columns: repeat(3, minmax(120px, 180px));
       gap: 8px;
       margin: 0 0 14px;
     }
@@ -104,6 +104,26 @@
     .tab-panel.active {
       display: block;
       animation: rise 0.2s ease;
+    }
+
+    .app-bottom-nav {
+      display: none;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 60;
+      background: rgba(247, 252, 255, 0.95);
+      border-top: 1px solid #cfe1ef;
+      backdrop-filter: blur(8px);
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .app-bottom-nav .tab-btn {
+      padding: 10px 8px;
+      font-size: 0.88rem;
     }
 
     .top-grid {
@@ -176,6 +196,13 @@
     .btn:hover {
       filter: brightness(1.05);
       transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      filter: none;
     }
 
     .btn.secondary {
@@ -476,6 +503,16 @@
       font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
     }
 
+    .follow-next {
+      margin: 0 0 8px;
+      font-size: 0.84rem;
+      color: #2f5f7f;
+      background: #edf6ff;
+      border: 1px solid #cfe2f3;
+      border-radius: 8px;
+      padding: 6px 8px;
+    }
+
     .follow-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(120px, 1fr));
@@ -547,11 +584,57 @@
       gap: 8px;
     }
 
+    .follow-start-layer {
+      margin-bottom: 10px;
+      border: 1px solid #cfe3f1;
+      background: #f5fbff;
+    }
+
+    .follow-start-layer p {
+      margin: 6px 0 0;
+      color: #365975;
+    }
+
     .follow-actions {
       display: grid;
-      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      grid-template-columns: 1fr;
       gap: 8px;
       margin-top: 10px;
+    }
+
+    .follow-transition {
+      margin-top: 10px;
+      border-radius: 12px;
+      border: 1px solid #b8dfc9;
+      background: #ecfff4;
+      padding: 12px;
+      box-shadow: 0 10px 24px rgba(18, 95, 53, 0.12);
+    }
+
+    .follow-transition p {
+      margin: 0 0 8px;
+      color: #1e5b34;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .follow-transition-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .follow-transition .transition-check {
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 8px;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ffffff;
+      background: linear-gradient(120deg, #0f9f70, #1f84c2);
     }
 
     .timer-wrap {
@@ -631,6 +714,19 @@
       align-items: center;
       gap: 10px;
       margin-bottom: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      padding: 10px;
+      border: 1px solid #d4e4f1;
+      border-radius: 14px;
+      background: rgba(248, 253, 255, 0.94);
+      backdrop-filter: blur(6px);
+    }
+
+    .focus-head-main {
+      display: grid;
+      gap: 6px;
     }
 
     .focus-head h2 {
@@ -638,9 +734,37 @@
       font-size: 1.25rem;
     }
 
-    .focus-close {
-      width: auto;
-      padding: 8px 12px;
+    .focus-head-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .session-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid #d6e4f1;
+      background: #f4f9ff;
+      color: #244159;
+    }
+
+    .session-top .session-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #43627d;
+    }
+
+    .session-top .session-time {
+      font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #134669;
     }
 
     .mobile-note {
@@ -660,7 +784,15 @@
       }
 
       .tab-switch {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        display: none;
+      }
+
+      .app-bottom-nav {
+        display: grid;
+      }
+
+      .wrap {
+        padding-bottom: calc(88px + env(safe-area-inset-bottom));
       }
 
       .card {
@@ -672,6 +804,10 @@
       }
 
       .follow-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .follow-transition-actions {
         grid-template-columns: 1fr;
       }
 
@@ -695,6 +831,20 @@
         grid-template-columns: 1fr;
       }
 
+      .focus-head {
+        align-items: stretch;
+      }
+
+      .focus-head-controls {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(90px, 1fr));
+      }
+
+      .focus-head-controls .btn {
+        width: 100%;
+      }
+
       .actions {
         position: sticky;
         bottom: 8px;
@@ -716,6 +866,7 @@
     <div class="tab-switch" role="tablist" aria-label="Workout views">
       <button type="button" class="tab-btn active" data-tab-target="trackerTabPanel" role="tab" aria-selected="true">Workout</button>
       <button type="button" class="tab-btn" data-tab-target="historyTabPanel" role="tab" aria-selected="false">History</button>
+      <button type="button" class="tab-btn" data-tab-target="statsTabPanel" role="tab" aria-selected="false">Stats</button>
     </div>
 
     <section id="trackerTabPanel" class="tab-panel active">
@@ -784,6 +935,11 @@
       <button class="btn secondary" id="exportCsv">Export CSV</button>
     </section>
 
+    <p class="footer-note">Data is stored locally in your browser (`localStorage`) on this device.</p>
+    </section>
+
+    <section id="statsTabPanel" class="tab-panel">
+
     <section class="card" id="effortSection">
       <h2>Daily Effort Summary</h2>
       <p>After finishing a workout day, save calories, total minutes, and max heart rate to track trends.</p>
@@ -850,8 +1006,6 @@
         </table>
       </div>
     </section>
-
-    <p class="footer-note">Data is stored locally in your browser (`localStorage`) on this device.</p>
     </section>
 
     <section id="historyTabPanel" class="tab-panel">
@@ -882,14 +1036,35 @@
     </section>
   </main>
 
+  <nav class="app-bottom-nav" role="tablist" aria-label="App navigation">
+    <button type="button" class="tab-btn active" data-tab-target="trackerTabPanel" role="tab" aria-selected="true">Workout</button>
+    <button type="button" class="tab-btn" data-tab-target="historyTabPanel" role="tab" aria-selected="false">History</button>
+    <button type="button" class="tab-btn" data-tab-target="statsTabPanel" role="tab" aria-selected="false">Stats</button>
+  </nav>
+
   <section id="focusMode" class="focus-mode" aria-hidden="true">
     <div class="focus-inner">
       <div class="focus-head">
-        <h2 id="followDayName">Follow-Along Session</h2>
-        <button class="btn secondary focus-close" id="followClose">Exit</button>
+        <div class="focus-head-main">
+          <h2 id="followDayName">Follow-Along Session</h2>
+          <div class="session-top">
+            <span class="session-label">Session</span>
+            <span class="session-time" id="followSessionTimer">00:00</span>
+          </div>
+        </div>
+        <div class="focus-head-controls">
+          <button class="btn" id="followSessionStart">Start</button>
+          <button class="btn secondary" id="followSessionPause">Pause</button>
+          <button class="btn secondary" id="followSessionStop">Stop</button>
+        </div>
       </div>
 
-      <article class="card">
+      <article class="card follow-start-layer" id="followStartLayer">
+        <h3>Session Control</h3>
+        <p>Press <strong>Start</strong> to begin. Use <strong>Pause</strong> anytime, and <strong>Stop</strong> to end this session.</p>
+      </article>
+
+      <article class="card" id="followExerciseCard" style="display:none;">
         <div class="follow-kicker">
           <div class="pill" id="followProgress">Exercise 1/1</div>
           <div class="pill" id="followDoneState">Pending</div>
@@ -897,6 +1072,7 @@
         </div>
         <h3 class="follow-exercise" id="followExercise">Exercise</h3>
         <p class="follow-target" id="followTarget">3 x 10</p>
+        <p class="follow-next" id="followNextExercise">Up next: -</p>
         <a class="video-link" id="followVideo" href="#" target="_blank" rel="noopener noreferrer">Open video</a>
 
         <div class="follow-grid">
@@ -939,10 +1115,6 @@
 
         <div class="timer-stack">
           <div class="timer-wrap">
-            <p class="timer-label">Workout Session Timer</p>
-            <p class="timer-time" id="followSessionTimer">00:00</p>
-          </div>
-          <div class="timer-wrap">
             <p class="timer-label">Exercise Counter</p>
             <p class="timer-time" id="followExerciseTimer">00:00</p>
           </div>
@@ -957,10 +1129,15 @@
           </div>
         </div>
 
-        <div class="follow-actions">
-          <button class="btn secondary" id="followPrev">Previous</button>
-          <button class="btn" id="followDoneNext">Done + Next</button>
-          <button class="btn secondary" id="followSkip">Skip</button>
+        <div class="follow-actions" id="followPrimaryActions">
+          <button class="btn" id="followDoneNext">Complete</button>
+        </div>
+        <div class="follow-transition" id="followTransition" style="display:none;">
+          <div class="transition-check" aria-hidden="true">✓</div>
+          <p id="followTransitionText">Completed! Ready for next exercise.</p>
+          <div class="follow-transition-actions">
+            <button class="btn" id="followTransitionNext">Next</button>
+          </div>
         </div>
       </article>
     </div>
@@ -1038,10 +1215,14 @@
       sessionElapsed: 0,
       sessionTimer: null,
       timedLeft: 0,
-      timedTimer: null
+      timedTimer: null,
+      started: false,
+      running: false
     };
     let effortHistory = [];
     let exerciseHistory = [];
+    let followTransitionPending = false;
+    let followTransitionAction = "next";
 
     function createRow(dayId, idx, exercise, target) {
       const rowId = `${dayId}_${idx}`;
@@ -1553,12 +1734,86 @@
       return 0;
     }
 
+    function setFollowSessionLayer(showExercise) {
+      document.getElementById("followStartLayer").style.display = showExercise ? "none" : "block";
+      document.getElementById("followExerciseCard").style.display = showExercise ? "block" : "none";
+    }
+
+    function updateSessionControlButtons() {
+      const startBtn = document.getElementById("followSessionStart");
+      const pauseBtn = document.getElementById("followSessionPause");
+      const stopBtn = document.getElementById("followSessionStop");
+      if (!startBtn || !pauseBtn || !stopBtn) return;
+
+      if (!followSession.started) {
+        startBtn.textContent = "Start";
+      } else if (followSession.running) {
+        startBtn.textContent = "Running";
+      } else {
+        startBtn.textContent = "Resume";
+      }
+
+      startBtn.disabled = followSession.running || followTransitionPending;
+      pauseBtn.disabled = !(followSession.started && followSession.running);
+      stopBtn.disabled = false;
+    }
+
+    function setFollowTransition(active, message = "Completed! Ready for next exercise.", action = "next") {
+      followTransitionPending = Boolean(active);
+      followTransitionAction = action;
+      const box = document.getElementById("followTransition");
+      const text = document.getElementById("followTransitionText");
+      const primary = document.getElementById("followPrimaryActions");
+      const actionBtn = document.getElementById("followTransitionNext");
+      box.style.display = followTransitionPending ? "block" : "none";
+      primary.style.display = followTransitionPending ? "none" : "grid";
+      text.textContent = message;
+      actionBtn.textContent = action === "save" ? "Save Session" : "Next";
+      updateSessionControlButtons();
+    }
+
+    function completeCurrentExercise() {
+      const { day, exercise } = getActiveExerciseMeta();
+      const doneEl = getRowField(day.id, followSession.exIndex, "done");
+      if (doneEl) doneEl.checked = true;
+      upsertCompletedExerciseHistory(day.id, followSession.exIndex, "follow");
+
+      syncTableFromFollow();
+      updateSummary();
+
+      stopExerciseTimer();
+      stopTimedCountdown();
+      resetFollowTimer();
+      followSession.running = false;
+      updateSessionControlButtons();
+
+      const isLastExercise = followSession.exIndex >= day.exercises.length - 1;
+      if (isLastExercise) {
+        setFollowTransition(true, `${day.name} completed. Tap Save Session.`, "save");
+        return;
+      }
+      setFollowTransition(true, `${exercise} completed!`, "next");
+    }
+
+    function handleTransitionPrimaryAction() {
+      if (followTransitionAction === "save") {
+        saveState();
+        const finishedDayIndex = followSession.dayIndex;
+        closeFollowMode();
+        prefillEffortFromCompletedDay(finishedDayIndex);
+        alert("Session completed and saved. Add calories and max HR, then tap Save Daily Summary.");
+        return;
+      }
+      moveFollowStep({ direction: 1 });
+    }
+
     function renderFollowStep() {
       followSession.dayIndex = clamp(followSession.dayIndex, 0, plan.length - 1);
       const day = plan[followSession.dayIndex];
       followSession.exIndex = clamp(followSession.exIndex, 0, day.exercises.length - 1);
 
       const [exercise, target] = day.exercises[followSession.exIndex];
+      const nextTuple = day.exercises[followSession.exIndex + 1] || null;
       const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${exercise} exercise proper form`)}`;
       const timed = isTimedExercise(exercise, target);
 
@@ -1567,13 +1822,17 @@
       document.getElementById("followProgress").textContent = `Exercise ${followSession.exIndex + 1}/${day.exercises.length}`;
       document.getElementById("followExercise").textContent = exercise;
       document.getElementById("followTarget").textContent = target;
+      document.getElementById("followNextExercise").textContent = nextTuple
+        ? `Up next: ${nextTuple[0]} (${nextTuple[1]})`
+        : "Up next: Workout complete";
       document.getElementById("followVideo").href = videoUrl;
+      setFollowTransition(false);
 
       syncFollowFromTable();
       document.getElementById("followTimedTimerWrap").style.display = timed ? "block" : "none";
 
       if (isFollowModeOpen()) {
-        resetExerciseTimer(true);
+        resetExerciseTimer(followSession.started && followSession.running);
         if (timed) {
           resetTimedCountdown();
         } else {
@@ -1643,6 +1902,33 @@
       if (start) startSessionTimer();
     }
 
+    function startFollowSession() {
+      if (!followSession.started) {
+        followSession.started = true;
+        setFollowSessionLayer(true);
+        renderFollowStep();
+      }
+      followSession.running = true;
+      startSessionTimer();
+      startExerciseTimer();
+      updateSessionControlButtons();
+    }
+
+    function pauseFollowSession() {
+      if (!(followSession.started && followSession.running)) return;
+      followSession.running = false;
+      stopSessionTimer();
+      stopExerciseTimer();
+      stopFollowTimer();
+      stopTimedCountdown();
+      updateSessionControlButtons();
+    }
+
+    function stopFollowSession() {
+      if (followSession.started) syncTableFromFollow();
+      closeFollowMode();
+    }
+
     function getCurrentTimedDurationSeconds() {
       const { target } = getActiveExerciseMeta();
       const fromInput = parseMinutesFromText(document.getElementById("followDurationMin").value);
@@ -1670,6 +1956,7 @@
     }
 
     function toggleTimedCountdown() {
+      if (!followSession.running) return;
       if (followSession.timedTimer) {
         stopTimedCountdown();
         return;
@@ -1709,6 +1996,7 @@
     }
 
     function toggleFollowTimer() {
+      if (!followSession.running) return;
       if (followSession.restTimer) {
         stopFollowTimer();
         return;
@@ -1743,9 +2031,15 @@
       document.getElementById("focusMode").classList.add("active");
       document.getElementById("focusMode").setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
-      resetSessionTimer(true);
+      followSession.started = false;
+      followSession.running = false;
+      setFollowSessionLayer(false);
+      setFollowTransition(false);
+      resetSessionTimer(false);
+      resetExerciseTimer(false);
       renderFollowStep();
       resetFollowTimer();
+      updateSessionControlButtons();
     }
 
     function closeFollowMode() {
@@ -1753,7 +2047,12 @@
       stopExerciseTimer();
       stopSessionTimer();
       stopTimedCountdown();
-      syncTableFromFollow();
+      if (followSession.started) syncTableFromFollow();
+      followSession.started = false;
+      followSession.running = false;
+      setFollowSessionLayer(false);
+      setFollowTransition(false);
+      updateSessionControlButtons();
       document.getElementById("focusMode").classList.remove("active");
       document.getElementById("focusMode").setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
@@ -1762,6 +2061,7 @@
 
     function moveFollowStep({ markDone = false, direction = 1 } = {}) {
       const { day } = getActiveExerciseMeta();
+      setFollowTransition(false);
       if (markDone) {
         const doneEl = getRowField(day.id, followSession.exIndex, "done");
         if (doneEl) doneEl.checked = true;
@@ -1773,16 +2073,19 @@
       const next = followSession.exIndex + direction;
       if (next >= 0 && next < day.exercises.length) {
         followSession.exIndex = next;
+        followSession.running = true;
+        startSessionTimer();
         resetFollowTimer();
+        updateSessionControlButtons();
         renderFollowStep();
         return;
       }
 
       if (direction > 0) {
-        const finishedDayIndex = followSession.dayIndex;
-        closeFollowMode();
-        prefillEffortFromCompletedDay(finishedDayIndex);
-        alert(`${day.name} complete. Add calories and max HR, then save your daily summary.`);
+        followSession.running = false;
+        updateSessionControlButtons();
+        stopSessionTimer();
+        setFollowTransition(true, `${day.name} completed. Tap Save Session.`, "save");
       }
     }
 
@@ -1810,7 +2113,8 @@
     }
 
     function setActiveTab(tabId) {
-      const chosen = tabId === "historyTabPanel" ? "historyTabPanel" : "trackerTabPanel";
+      const validTabs = ["trackerTabPanel", "historyTabPanel", "statsTabPanel"];
+      const chosen = validTabs.includes(tabId) ? tabId : "trackerTabPanel";
       document.querySelectorAll(".tab-btn").forEach(btn => {
         const active = btn.dataset.tabTarget === chosen;
         btn.classList.toggle("active", active);
@@ -2225,7 +2529,7 @@
     function prefillEffortFromCompletedDay(dayIndex) {
       const day = plan[dayIndex];
       if (!day) return;
-      setActiveTab("trackerTabPanel");
+      setActiveTab("statsTabPanel");
       setEffortDateTodayIfEmpty();
       document.getElementById("effortDay").value = day.id;
       document.getElementById("effortTotalMin").value = String(estimateDayTotalMinutes(dayIndex));
@@ -2269,10 +2573,8 @@
         followSession.exIndex = findFirstUndoneIndex(followSession.dayIndex);
         openFollowMode();
       });
-      document.getElementById("followClose").addEventListener("click", closeFollowMode);
-      document.getElementById("followPrev").addEventListener("click", () => moveFollowStep({ direction: -1 }));
-      document.getElementById("followDoneNext").addEventListener("click", () => moveFollowStep({ markDone: true, direction: 1 }));
-      document.getElementById("followSkip").addEventListener("click", () => moveFollowStep({ direction: 1 }));
+      document.getElementById("followDoneNext").addEventListener("click", completeCurrentExercise);
+      document.getElementById("followTransitionNext").addEventListener("click", handleTransitionPrimaryAction);
 
       document.getElementById("followDay").addEventListener("change", e => {
         followSession.dayIndex = clamp(Number(e.target.value) || 0, 0, plan.length - 1);
@@ -2287,6 +2589,9 @@
         updateFollowTimer();
       });
       document.getElementById("followTimerReset").addEventListener("click", resetFollowTimer);
+      document.getElementById("followSessionStart").addEventListener("click", startFollowSession);
+      document.getElementById("followSessionPause").addEventListener("click", pauseFollowSession);
+      document.getElementById("followSessionStop").addEventListener("click", stopFollowSession);
       document.getElementById("followTimedStart").addEventListener("click", toggleTimedCountdown);
       document.getElementById("followTimedAdd").addEventListener("click", () => {
         followSession.timedLeft = clamp(followSession.timedLeft + 60, 0, 4 * 60 * 60);
@@ -2358,7 +2663,11 @@
       resetExerciseTimer();
       followSession.timedLeft = 0;
       updateTimedCountdown();
+      setFollowSessionLayer(false);
+      followSession.started = false;
+      followSession.running = false;
       renderFollowStep();
+      updateSessionControlButtons();
       const effortIdx = plan.findIndex(day => day.id === document.getElementById("effortDay").value);
       if (effortIdx >= 0 && !document.getElementById("effortTotalMin").value) {
         document.getElementById("effortTotalMin").value = String(estimateDayTotalMinutes(effortIdx));
