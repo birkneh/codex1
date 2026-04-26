@@ -773,6 +773,7 @@
         <div class="follow-kicker">
           <div class="pill" id="followProgress">Exercise 1/1</div>
           <div class="pill" id="followDoneState">Pending</div>
+          <div class="pill" id="followPainBadge">Pain: -</div>
         </div>
         <h3 class="follow-exercise" id="followExercise">Exercise</h3>
         <p class="follow-target" id="followTarget">3 x 10</p>
@@ -793,7 +794,7 @@
           </div>
           <div>
             <label for="followPain">Pain (0-10)</label>
-            <input type="number" class="pain" min="0" max="10" id="followPain" placeholder="0-10" />
+            <input type="number" class="pain" min="0" max="10" inputmode="numeric" id="followPain" placeholder="0-10" />
           </div>
           <div class="full">
             <label for="followNotes">Notes</label>
@@ -902,8 +903,8 @@
           </td>
           <td class="small">${target}</td>
           <td><input type="text" inputmode="decimal" data-k="${rowId}_weight" placeholder="kg" /></td>
-          <td><input type="text" data-k="${rowId}_reps" placeholder="e.g., 10,10,9" /></td>
-          <td><input type="number" class="pain" min="0" max="10" data-k="${rowId}_pain" placeholder="0-10" /></td>
+          <td><input type="number" min="0" max="200" step="1" inputmode="numeric" data-k="${rowId}_reps" placeholder="e.g., 10" /></td>
+          <td><input type="number" class="pain" min="0" max="10" inputmode="numeric" data-k="${rowId}_pain" placeholder="0-10" /></td>
           <td><textarea data-k="${rowId}_notes" placeholder="tempo, RIR, cues..."></textarea></td>
         </tr>
       `;
@@ -1231,7 +1232,7 @@
         <div class="follow-set-row" data-set-index="${idx}">
           <div class="set-tag">Set ${idx + 1}</div>
           <input type="text" inputmode="decimal" data-set-field="weight" value="${escapeHtml(set.weight)}" placeholder="Weight" />
-          <input type="text" data-set-field="reps" value="${escapeHtml(set.reps)}" placeholder="Reps" />
+          <input type="number" min="0" max="200" step="1" inputmode="numeric" data-set-field="reps" value="${escapeHtml(set.reps)}" placeholder="Reps" />
           <label class="set-check"><input type="checkbox" data-set-field="done" ${set.done ? "checked" : ""} />Done</label>
         </div>
       `).join("");
@@ -1286,6 +1287,11 @@
       document.getElementById("followDoneState").textContent = doneEl?.checked ? "Completed" : "Pending";
     }
 
+    function updateFollowPainBadge() {
+      const value = document.getElementById("followPain").value;
+      document.getElementById("followPainBadge").textContent = `Pain: ${value === "" ? "-" : value}`;
+    }
+
     function syncFollowFromTable() {
       const { day, exercise, target } = getActiveExerciseMeta();
       const timed = isTimedExercise(exercise, target);
@@ -1302,6 +1308,7 @@
       }
       document.getElementById("followPain").value = getRowField(day.id, followSession.exIndex, "pain")?.value || "";
       document.getElementById("followNotes").value = getRowField(day.id, followSession.exIndex, "notes")?.value || "";
+      updateFollowPainBadge();
       updateFollowDoneState();
     }
 
@@ -1322,12 +1329,12 @@
         updateFollowSetVisualStates();
         const loggedSets = sets.filter(s => s.done || s.weight || s.reps);
         const lastWeight = [...loggedSets].reverse().find(s => s.weight)?.weight || "";
-        const repsCsv = loggedSets.map(s => s.reps).filter(Boolean).join(",");
+        const lastReps = [...loggedSets].reverse().find(s => s.reps)?.reps || "";
 
         const weightField = getRowField(day.id, followSession.exIndex, "weight");
         if (weightField) weightField.value = lastWeight;
         const repsField = getRowField(day.id, followSession.exIndex, "reps");
-        if (repsField) repsField.value = repsCsv;
+        if (repsField) repsField.value = lastReps;
       }
 
       const painField = getRowField(day.id, followSession.exIndex, "pain");
@@ -1337,6 +1344,7 @@
 
       const pain = Number(document.getElementById("followPain").value);
       document.getElementById("followPain").classList.toggle("high", Number.isFinite(pain) && pain >= 4);
+      updateFollowPainBadge();
 
       if (save) saveState();
     }
