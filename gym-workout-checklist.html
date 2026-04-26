@@ -327,6 +327,48 @@
       margin: 8px 0 0;
     }
 
+    .effort-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 8px;
+      align-items: end;
+    }
+
+    .graph-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .graph-card {
+      border: 1px solid #d5e5f2;
+      border-radius: 12px;
+      background: #fafdff;
+      padding: 10px;
+    }
+
+    .graph-card h3 {
+      margin: 0 0 6px;
+      font-size: 0.95rem;
+      color: #21486b;
+    }
+
+    .graph-svg {
+      width: 100%;
+      height: 130px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1px solid #dfebf6;
+    }
+
+    .effort-latest {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
     .follow-card {
       margin-bottom: 14px;
     }
@@ -618,7 +660,7 @@
         <p><strong>Schedule:</strong> Day 1 (Mon), Day 2 (Wed), Day 3 (Fri) or any non-consecutive pattern.</p>
         <p><strong>Progression:</strong> when you hit top reps for all sets, increase load 2.5-5% next week.</p>
         <p><strong>Intensity:</strong> leave 1-2 reps in reserve on most sets.</p>
-        <p><strong>Warm-up:</strong> 5-8 min cardio + 2 light ramp sets for first two exercises.</p>
+        <p><strong>Warm-up:</strong> 10-15 min cardio at the start, plus 5 min stretching at the end.</p>
         <div class="summary" id="summaryPills"></div>
       </article>
     </section>
@@ -648,6 +690,73 @@
       <button class="btn" id="saveNow">Save Progress</button>
       <button class="btn secondary" id="clearWeek">Clear This Week</button>
       <button class="btn secondary" id="exportCsv">Export CSV</button>
+    </section>
+
+    <section class="card" id="effortSection">
+      <h2>Daily Effort Summary</h2>
+      <p>After finishing a workout day, save calories, total minutes, and max heart rate to track trends.</p>
+      <div class="effort-grid">
+        <div>
+          <label for="effortDate">Date</label>
+          <input type="date" id="effortDate" />
+        </div>
+        <div>
+          <label for="effortDay">Workout Day</label>
+          <select id="effortDay"></select>
+        </div>
+        <div>
+          <label for="effortCalories">Calories</label>
+          <input type="number" id="effortCalories" min="0" max="2500" step="1" placeholder="e.g., 520" />
+        </div>
+        <div>
+          <label for="effortTotalMin">Total Minutes</label>
+          <input type="number" id="effortTotalMin" min="0" max="400" step="1" placeholder="e.g., 75" />
+        </div>
+        <div>
+          <label for="effortMaxHr">Max Heart Rate</label>
+          <input type="number" id="effortMaxHr" min="40" max="240" step="1" placeholder="e.g., 164" />
+        </div>
+        <div>
+          <label for="effortRpe">Effort Level (RPE 1-10)</label>
+          <input type="number" id="effortRpe" min="1" max="10" step="1" placeholder="e.g., 7" />
+        </div>
+        <div>
+          <button class="btn" id="saveEffort">Save Daily Summary</button>
+        </div>
+      </div>
+      <div class="effort-latest" id="effortLatest"></div>
+
+      <div class="graph-grid">
+        <article class="graph-card">
+          <h3>Calories by Day</h3>
+          <svg class="graph-svg" id="graphCalories" viewBox="0 0 320 130" preserveAspectRatio="none"></svg>
+        </article>
+        <article class="graph-card">
+          <h3>Total Minutes by Day</h3>
+          <svg class="graph-svg" id="graphMinutes" viewBox="0 0 320 130" preserveAspectRatio="none"></svg>
+        </article>
+        <article class="graph-card">
+          <h3>Max Heart Rate by Day</h3>
+          <svg class="graph-svg" id="graphHr" viewBox="0 0 320 130" preserveAspectRatio="none"></svg>
+        </article>
+      </div>
+
+      <div class="table-wrap" style="margin-top:10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Day</th>
+              <th>Calories</th>
+              <th>Total Min</th>
+              <th>Max HR</th>
+              <th>RPE</th>
+              <th>Effort</th>
+            </tr>
+          </thead>
+          <tbody id="effortTableBody"></tbody>
+        </table>
+      </div>
     </section>
 
     <p class="footer-note">Data is stored locally in your browser (`localStorage`) on this device.</p>
@@ -713,6 +822,7 @@
         name: "Day 1 - Upper + Quads",
         focus: "Chest, back, shoulders, quads, hamstrings, arms",
         exercises: [
+          ["Cardio Warm-up (Treadmill/Bike/Row)", "10-15 min"],
           ["Incline Dumbbell Press", "3 x 6-10"],
           ["Seated Cable Row", "3 x 8-12"],
           ["Machine Shoulder Press", "3 x 8-12"],
@@ -721,7 +831,8 @@
           ["Lying or Seated Hamstring Curl", "3 x 10-15"],
           ["Cable Lateral Raise", "2 x 12-20"],
           ["Triceps Pressdown", "2 x 10-15"],
-          ["Dumbbell Curl", "2 x 10-15"]
+          ["Dumbbell Curl", "2 x 10-15"],
+          ["Stretching / Cooldown", "5 min"]
         ]
       },
       {
@@ -729,6 +840,7 @@
         name: "Day 2 - Lower + Push/Pull",
         focus: "Glute-safe lower body + chest and back volume",
         exercises: [
+          ["Cardio Warm-up (Treadmill/Bike/Row)", "10-15 min"],
           ["Bulgarian Split Squat", "3 x 8-12 / leg"],
           ["Hip Thrust (machine or barbell, moderate)", "3 x 8-12"],
           ["Flat Dumbbell Bench Press", "3 x 8-12"],
@@ -736,7 +848,8 @@
           ["Leg Extension", "3 x 12-15"],
           ["Seated Leg Curl", "3 x 10-15"],
           ["Standing Calf Raise", "3 x 12-20"],
-          ["Plank", "3 x 30-45 sec"]
+          ["Plank", "3 x 30-45 sec"],
+          ["Stretching / Cooldown", "5 min"]
         ]
       },
       {
@@ -744,6 +857,7 @@
         name: "Day 3 - Full Body (Light Hinge)",
         focus: "Second full hit for all major groups with lighter hinge work",
         exercises: [
+          ["Cardio Warm-up (Treadmill/Bike/Row)", "10-15 min"],
           ["Goblet Squat or Hack Squat (moderate)", "3 x 10-15"],
           ["Romanian Deadlift (light, optional)", "2 x 8-10"],
           ["Pull-Up or Assisted Pull-Up", "3 x 6-10"],
@@ -751,13 +865,15 @@
           ["Single-Arm Cable Row", "2 x 10-12 / side"],
           ["Face Pull", "2 x 12-20"],
           ["Reverse Lunge", "2 x 8-10 / leg"],
-          ["Dead Bug", "3 x 8-10 / side"]
+          ["Dead Bug", "3 x 8-10 / side"],
+          ["Stretching / Cooldown", "5 min"]
         ]
       }
     ];
 
     const stateKey = "gymTrackerState_v1";
     const followStateKey = "gymTrackerFollowState_v1";
+    const effortStateKey = "gymEffortHistory_v1";
     const followSession = {
       dayIndex: 0,
       exIndex: 0,
@@ -765,6 +881,7 @@
       restLeft: 75,
       restTimer: null
     };
+    let effortHistory = [];
 
     function createRow(dayId, idx, exercise, target) {
       const rowId = `${dayId}_${idx}`;
@@ -998,7 +1115,9 @@
 
     function parseSetCountFromTarget(target) {
       const m = String(target || "").match(/(\d+)\s*x/i);
-      return clamp(m ? Number(m[1]) : 3, 1, 10);
+      if (m) return clamp(Number(m[1]), 1, 10);
+      if (/\bmin\b/i.test(String(target || ""))) return 1;
+      return 3;
     }
 
     function sanitizeSets(sets) {
@@ -1309,8 +1428,10 @@
       }
 
       if (direction > 0) {
+        const finishedDayIndex = followSession.dayIndex;
         closeFollowMode();
-        alert(`${day.name} complete. Great work.`);
+        prefillEffortFromCompletedDay(finishedDayIndex);
+        alert(`${day.name} complete. Add calories and max HR, then save your daily summary.`);
       }
     }
 
@@ -1327,6 +1448,243 @@
       sets.pop();
       renderFollowSets(sets);
       syncTableFromFollow();
+    }
+
+    function getDayById(dayId) {
+      return plan.find(day => day.id === dayId);
+    }
+
+    function setEffortDateTodayIfEmpty() {
+      const input = document.getElementById("effortDate");
+      if (input.value) return;
+      input.value = new Date().toISOString().slice(0, 10);
+    }
+
+    function populateEffortDayOptions() {
+      const sel = document.getElementById("effortDay");
+      sel.innerHTML = plan.map(day => `<option value="${day.id}">${day.name}</option>`).join("");
+      if (!sel.value && plan[0]) sel.value = plan[0].id;
+    }
+
+    function loadEffortHistory() {
+      const raw = localStorage.getItem(effortStateKey);
+      if (!raw) {
+        effortHistory = [];
+        return;
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        effortHistory = Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error("Could not load effort history", e);
+        effortHistory = [];
+      }
+    }
+
+    function saveEffortHistory() {
+      localStorage.setItem(effortStateKey, JSON.stringify(effortHistory));
+    }
+
+    function computeEffortLevel(calories, totalMin, maxHr, rpe) {
+      let score;
+      if (Number.isFinite(rpe) && rpe >= 1 && rpe <= 10) {
+        score = rpe;
+      } else {
+        score = (calories / 600) * 4 + (totalMin / 80) * 3 + (maxHr / 180) * 3;
+      }
+      score = clamp(Math.round(score), 1, 10);
+      if (score <= 3) return "Light";
+      if (score <= 6) return "Moderate";
+      if (score <= 8) return "Hard";
+      return "Very Hard";
+    }
+
+    function parseMinutesFromText(text) {
+      const str = String(text || "").trim();
+      const range = str.match(/(\d+)\s*-\s*(\d+)/);
+      if (range) return Math.round((Number(range[1]) + Number(range[2])) / 2);
+      const single = str.match(/(\d+)/);
+      return single ? Number(single[1]) : 0;
+    }
+
+    function estimateDayTotalMinutes(dayIndex) {
+      const day = plan[dayIndex];
+      if (!day) return 0;
+
+      let total = 0;
+      day.exercises.forEach((ex, idx) => {
+        const [name, target] = ex;
+        const sets = readSetsFromRow(day.id, idx);
+        const lowerName = String(name).toLowerCase();
+
+        if (lowerName.includes("cardio warm-up")) {
+          const entered = parseMinutesFromText(sets.find(s => s.reps)?.reps || "");
+          total += entered || parseMinutesFromText(target) || 12;
+          return;
+        }
+
+        if (lowerName.includes("stretching")) {
+          const entered = parseMinutesFromText(sets.find(s => s.reps)?.reps || "");
+          total += entered || parseMinutesFromText(target) || 5;
+          return;
+        }
+
+        const logged = sets.filter(s => s.done || s.weight || s.reps).length;
+        const setCount = logged || parseSetCountFromTarget(target);
+        total += Math.max(1, setCount) * 2;
+      });
+
+      return Math.round(total);
+    }
+
+    function renderSimpleLineGraph(svgId, values, color) {
+      const svg = document.getElementById(svgId);
+      if (!svg) return;
+      const width = 320;
+      const height = 130;
+      const pad = 18;
+
+      if (!values.length) {
+        svg.innerHTML = `<text x="${width / 2}" y="${height / 2}" text-anchor="middle" fill="#5d7388" font-size="12">No data yet</text>`;
+        return;
+      }
+
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const range = max - min || 1;
+      const spread = values.length - 1 || 1;
+
+      const points = values.map((v, i) => {
+        const x = pad + (i / spread) * (width - pad * 2);
+        const y = height - pad - ((v - min) / range) * (height - pad * 2);
+        return { x, y };
+      });
+
+      const polyline = points.map(p => `${p.x},${p.y}`).join(" ");
+      const circles = points.map(p => `<circle cx="${p.x}" cy="${p.y}" r="2.8" fill="${color}" />`).join("");
+
+      svg.innerHTML = `
+        <line x1="${pad}" y1="${height - pad}" x2="${width - pad}" y2="${height - pad}" stroke="#d9e6f2" />
+        <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${height - pad}" stroke="#d9e6f2" />
+        <polyline fill="none" stroke="${color}" stroke-width="2.6" points="${polyline}" />
+        ${circles}
+        <text x="${pad}" y="${pad - 5}" fill="#5d7388" font-size="10">max ${max}</text>
+        <text x="${pad}" y="${height - 4}" fill="#5d7388" font-size="10">min ${min}</text>
+      `;
+    }
+
+    function renderEffortTable() {
+      const body = document.getElementById("effortTableBody");
+      const rows = [...effortHistory].sort((a, b) => {
+        if (a.date === b.date) return a.dayId.localeCompare(b.dayId);
+        return a.date < b.date ? 1 : -1;
+      });
+
+      body.innerHTML = rows.map(item => `
+        <tr>
+          <td>${escapeHtml(item.date)}</td>
+          <td>${escapeHtml(getDayById(item.dayId)?.name || item.dayId)}</td>
+          <td>${item.calories}</td>
+          <td>${item.totalMin}</td>
+          <td>${item.maxHr}</td>
+          <td>${item.rpe ?? ""}</td>
+          <td>${escapeHtml(item.effortLevel)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderEffortLatest() {
+      const latest = [...effortHistory].sort((a, b) => {
+        if (a.date === b.date) return a.dayId.localeCompare(b.dayId);
+        return a.date > b.date ? -1 : 1;
+      })[0];
+
+      const host = document.getElementById("effortLatest");
+      if (!latest) {
+        host.innerHTML = `<div class="pill">No daily summary saved yet.</div>`;
+        return;
+      }
+
+      host.innerHTML = `
+        <div class="pill">${latest.date}</div>
+        <div class="pill">${getDayById(latest.dayId)?.name || latest.dayId}</div>
+        <div class="pill">Calories: ${latest.calories}</div>
+        <div class="pill">Minutes: ${latest.totalMin}</div>
+        <div class="pill">Max HR: ${latest.maxHr}</div>
+        <div class="pill">Effort: ${latest.effortLevel}</div>
+      `;
+    }
+
+    function renderEffortGraphs() {
+      const points = [...effortHistory].sort((a, b) => (a.date < b.date ? -1 : 1)).slice(-30);
+      renderSimpleLineGraph("graphCalories", points.map(p => p.calories), "#e55b48");
+      renderSimpleLineGraph("graphMinutes", points.map(p => p.totalMin), "#0b74b8");
+      renderSimpleLineGraph("graphHr", points.map(p => p.maxHr), "#0e9f6e");
+    }
+
+    function renderEffortDashboard() {
+      renderEffortLatest();
+      renderEffortGraphs();
+      renderEffortTable();
+    }
+
+    function saveEffortFromForm() {
+      const date = document.getElementById("effortDate").value;
+      const dayId = document.getElementById("effortDay").value;
+      const calories = Number(document.getElementById("effortCalories").value);
+      const totalMin = Number(document.getElementById("effortTotalMin").value);
+      const maxHr = Number(document.getElementById("effortMaxHr").value);
+      const rpeRaw = document.getElementById("effortRpe").value;
+      const rpe = rpeRaw === "" ? null : Number(rpeRaw);
+
+      if (!date || !dayId) {
+        alert("Select date and workout day.");
+        return;
+      }
+      if (!Number.isFinite(calories) || calories <= 0) {
+        alert("Enter calories burned.");
+        return;
+      }
+      if (!Number.isFinite(totalMin) || totalMin <= 0) {
+        alert("Enter total workout minutes.");
+        return;
+      }
+      if (!Number.isFinite(maxHr) || maxHr <= 0) {
+        alert("Enter max heart rate.");
+        return;
+      }
+      if (rpe !== null && (!Number.isFinite(rpe) || rpe < 1 || rpe > 10)) {
+        alert("RPE must be between 1 and 10.");
+        return;
+      }
+
+      const entry = {
+        date,
+        dayId,
+        calories: Math.round(calories),
+        totalMin: Math.round(totalMin),
+        maxHr: Math.round(maxHr),
+        rpe: rpe === null ? null : Math.round(rpe),
+        effortLevel: computeEffortLevel(calories, totalMin, maxHr, rpe)
+      };
+
+      const idx = effortHistory.findIndex(item => item.date === entry.date && item.dayId === entry.dayId);
+      if (idx >= 0) {
+        effortHistory[idx] = entry;
+      } else {
+        effortHistory.push(entry);
+      }
+      saveEffortHistory();
+      renderEffortDashboard();
+    }
+
+    function prefillEffortFromCompletedDay(dayIndex) {
+      const day = plan[dayIndex];
+      if (!day) return;
+      setEffortDateTodayIfEmpty();
+      document.getElementById("effortDay").value = day.id;
+      document.getElementById("effortTotalMin").value = String(estimateDayTotalMinutes(dayIndex));
+      document.getElementById("effortSection").scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     function registerServiceWorker() {
@@ -1348,6 +1706,13 @@
       document.getElementById("saveNow").addEventListener("click", saveState);
       document.getElementById("clearWeek").addEventListener("click", clearWeek);
       document.getElementById("exportCsv").addEventListener("click", exportCsv);
+      document.getElementById("saveEffort").addEventListener("click", saveEffortFromForm);
+      document.getElementById("effortDay").addEventListener("change", e => {
+        const idx = plan.findIndex(day => day.id === e.target.value);
+        if (idx >= 0) {
+          document.getElementById("effortTotalMin").value = String(estimateDayTotalMinutes(idx));
+        }
+      });
 
       document.getElementById("followStart").addEventListener("click", () => {
         followSession.dayIndex = clamp(Number(document.getElementById("followDay").value) || 0, 0, plan.length - 1);
@@ -1402,8 +1767,16 @@
       refreshAllSetSummaries();
       loadFollowState();
       populateFollowDayOptions();
+      populateEffortDayOptions();
+      setEffortDateTodayIfEmpty();
+      loadEffortHistory();
+      renderEffortDashboard();
       resetFollowTimer();
       renderFollowStep();
+      const effortIdx = plan.findIndex(day => day.id === document.getElementById("effortDay").value);
+      if (effortIdx >= 0 && !document.getElementById("effortTotalMin").value) {
+        document.getElementById("effortTotalMin").value = String(estimateDayTotalMinutes(effortIdx));
+      }
       bindEvents();
       if (!document.getElementById("goal").value) {
         document.getElementById("goal").value = "recomp";

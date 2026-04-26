@@ -8,10 +8,12 @@ Simple HTML workout tracker for a 3-day full-gym program.
 - Built-in protein target calculator
 - Per-exercise tracking for weights, reps, pain score, and notes
 - Follow-along mode with one exercise at a time
+- Cardio warm-up (10-15 min) and stretching cooldown (5 min) built into each day
 - Rest timer with start/pause/reset and +15s control
 - Auto-save using browser localStorage
 - CSV export
 - Video link per exercise
+- Daily effort summaries (calories, total minutes, max HR, RPE) with trend graphs
 - Installable web-app style experience (manifest + service worker)
 
 ## Run Locally
