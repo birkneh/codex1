@@ -3,6 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0e9f6e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Gym Follow" />
+  <link rel="manifest" href="manifest.webmanifest" />
   <title>3-Day Gym Tracker</title>
   <style>
     :root {
@@ -300,9 +305,179 @@
       margin: 8px 0 0;
     }
 
+    .follow-card {
+      margin-bottom: 14px;
+    }
+
+    .follow-top {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+      align-items: end;
+    }
+
+    .follow-top p {
+      margin: 0;
+      grid-column: 1 / -1;
+    }
+
+    .follow-panel {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: #f8fcff;
+    }
+
+    .follow-kicker {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .follow-kicker .pill {
+      background: #edf4ff;
+      border-color: #ccdcf6;
+      color: #203d63;
+    }
+
+    .follow-exercise {
+      margin: 0 0 6px;
+      font-size: 1.2rem;
+      line-height: 1.2;
+    }
+
+    .follow-target {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
+    }
+
+    .follow-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .follow-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    .follow-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .timer-wrap {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      background: #fffaf0;
+      border: 1px solid #f1dfbc;
+    }
+
+    .timer-time {
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      margin: 0 0 8px;
+      line-height: 1;
+      letter-spacing: 0.02em;
+      font-weight: 700;
+      color: #6e4a11;
+    }
+
+    .timer-controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(90px, 1fr));
+      gap: 8px;
+    }
+
+    .focus-mode {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      background:
+        radial-gradient(circle at 20% 20%, #ffe2a6 0%, transparent 40%),
+        radial-gradient(circle at 90% 10%, #cceffc 0%, transparent 34%),
+        linear-gradient(150deg, #f8f4e8, #eaf0f5);
+      overflow: auto;
+    }
+
+    .focus-mode.active {
+      display: block;
+      animation: rise 0.25s ease;
+    }
+
+    .focus-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 18px 14px 30px;
+    }
+
+    .focus-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .focus-head h2 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .focus-close {
+      width: auto;
+      padding: 8px 12px;
+    }
+
+    .mobile-note {
+      font-size: 0.85rem;
+      margin-top: 8px;
+      color: #2d536d;
+    }
+
     @media (max-width: 760px) {
       .inputs {
         grid-template-columns: 1fr;
+      }
+
+      .wrap {
+        margin-top: 10px;
+        padding: 0 10px;
+      }
+
+      .card {
+        padding: 12px;
+      }
+
+      .follow-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .follow-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .timer-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        position: sticky;
+        bottom: 8px;
+        z-index: 20;
+        background: rgba(248, 252, 255, 0.9);
+        padding: 8px;
+        border-radius: 12px;
+        border: 1px solid #d7e6f3;
+        backdrop-filter: blur(4px);
       }
     }
   </style>
@@ -350,6 +525,25 @@
       </article>
     </section>
 
+    <section class="card follow-card">
+      <h2>Follow-Along Mode (Mobile)</h2>
+      <div class="follow-top">
+        <p>Run one exercise at a time with large controls and a built-in rest timer.</p>
+        <div>
+          <label for="followDay">Workout Day</label>
+          <select id="followDay"></select>
+        </div>
+        <div>
+          <label for="followRest">Rest Timer (sec)</label>
+          <input type="number" id="followRest" min="15" max="300" step="5" value="75" />
+        </div>
+        <div>
+          <button class="btn" id="followStart">Start Follow-Along</button>
+        </div>
+      </div>
+      <p class="mobile-note">iPhone install: Safari -> Share -> Add to Home Screen.</p>
+    </section>
+
     <section id="days"></section>
 
     <section class="actions">
@@ -360,6 +554,59 @@
 
     <p class="footer-note">Data is stored locally in your browser (`localStorage`) on this device.</p>
   </main>
+
+  <section id="focusMode" class="focus-mode" aria-hidden="true">
+    <div class="focus-inner">
+      <div class="focus-head">
+        <h2 id="followDayName">Follow-Along Session</h2>
+        <button class="btn secondary focus-close" id="followClose">Exit</button>
+      </div>
+
+      <article class="card">
+        <div class="follow-kicker">
+          <div class="pill" id="followProgress">Exercise 1/1</div>
+          <div class="pill" id="followDoneState">Pending</div>
+        </div>
+        <h3 class="follow-exercise" id="followExercise">Exercise</h3>
+        <p class="follow-target" id="followTarget">3 x 10</p>
+        <a class="video-link" id="followVideo" href="#" target="_blank" rel="noopener noreferrer">Open video</a>
+
+        <div class="follow-grid">
+          <div>
+            <label for="followWeight">Weight (kg)</label>
+            <input type="text" inputmode="decimal" id="followWeight" placeholder="kg" />
+          </div>
+          <div>
+            <label for="followReps">Reps</label>
+            <input type="text" id="followReps" placeholder="e.g., 10,9,8" />
+          </div>
+          <div>
+            <label for="followPain">Pain (0-10)</label>
+            <input type="number" class="pain" min="0" max="10" id="followPain" placeholder="0-10" />
+          </div>
+          <div class="full">
+            <label for="followNotes">Notes</label>
+            <textarea id="followNotes" placeholder="cues, tempo, RIR..."></textarea>
+          </div>
+        </div>
+
+        <div class="timer-wrap">
+          <p class="timer-time" id="followTimer">01:15</p>
+          <div class="timer-controls">
+            <button class="btn" id="followTimerStart">Start Rest</button>
+            <button class="btn secondary" id="followTimerAdd">+15s</button>
+            <button class="btn secondary" id="followTimerReset">Reset</button>
+          </div>
+        </div>
+
+        <div class="follow-actions">
+          <button class="btn secondary" id="followPrev">Previous</button>
+          <button class="btn" id="followDoneNext">Done + Next</button>
+          <button class="btn secondary" id="followSkip">Skip</button>
+        </div>
+      </article>
+    </div>
+  </section>
 
   <script>
     const plan = [
@@ -412,6 +659,14 @@
     ];
 
     const stateKey = "gymTrackerState_v1";
+    const followStateKey = "gymTrackerFollowState_v1";
+    const followSession = {
+      dayIndex: 0,
+      exIndex: 0,
+      restDefault: 75,
+      restLeft: 75,
+      restTimer: null
+    };
 
     function createRow(dayId, idx, exercise, target) {
       const rowId = `${dayId}_${idx}`;
@@ -538,6 +793,10 @@
         const v = Number(el.value);
         el.classList.toggle("high", Number.isFinite(v) && v >= 4);
       });
+
+      if (document.getElementById("focusMode")?.classList.contains("active")) {
+        updateFollowDoneState();
+      }
     }
 
     function calcProtein() {
@@ -613,6 +872,204 @@
       URL.revokeObjectURL(a.href);
     }
 
+    function clamp(n, min, max) {
+      return Math.min(max, Math.max(min, n));
+    }
+
+    function formatTimer(seconds) {
+      const s = Math.max(0, Math.floor(seconds));
+      const mm = String(Math.floor(s / 60)).padStart(2, "0");
+      const ss = String(s % 60).padStart(2, "0");
+      return `${mm}:${ss}`;
+    }
+
+    function getRowField(dayId, idx, field) {
+      return document.querySelector(`[data-k="${dayId}_${idx}_${field}"]`);
+    }
+
+    function getActiveExerciseMeta() {
+      const day = plan[followSession.dayIndex];
+      const [exercise, target] = day.exercises[followSession.exIndex];
+      return { day, exercise, target };
+    }
+
+    function updateFollowDoneState() {
+      const { day } = getActiveExerciseMeta();
+      const doneEl = getRowField(day.id, followSession.exIndex, "done");
+      document.getElementById("followDoneState").textContent = doneEl?.checked ? "Completed" : "Pending";
+    }
+
+    function syncFollowFromTable() {
+      const { day } = getActiveExerciseMeta();
+      document.getElementById("followWeight").value = getRowField(day.id, followSession.exIndex, "weight")?.value || "";
+      document.getElementById("followReps").value = getRowField(day.id, followSession.exIndex, "reps")?.value || "";
+      document.getElementById("followPain").value = getRowField(day.id, followSession.exIndex, "pain")?.value || "";
+      document.getElementById("followNotes").value = getRowField(day.id, followSession.exIndex, "notes")?.value || "";
+      updateFollowDoneState();
+    }
+
+    function syncTableFromFollow(save = true) {
+      const { day } = getActiveExerciseMeta();
+      const fields = ["weight", "reps", "pain", "notes"];
+      fields.forEach(field => {
+        const src = document.getElementById(`follow${field.charAt(0).toUpperCase()}${field.slice(1)}`);
+        const dst = getRowField(day.id, followSession.exIndex, field);
+        if (src && dst) dst.value = src.value;
+      });
+
+      const pain = Number(document.getElementById("followPain").value);
+      document.getElementById("followPain").classList.toggle("high", Number.isFinite(pain) && pain >= 4);
+
+      if (save) saveState();
+    }
+
+    function persistFollowState() {
+      localStorage.setItem(followStateKey, JSON.stringify({
+        dayIndex: followSession.dayIndex,
+        exIndex: followSession.exIndex,
+        restDefault: followSession.restDefault
+      }));
+    }
+
+    function loadFollowState() {
+      const raw = localStorage.getItem(followStateKey);
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        followSession.dayIndex = clamp(Number(data.dayIndex) || 0, 0, plan.length - 1);
+        const day = plan[followSession.dayIndex];
+        followSession.exIndex = clamp(Number(data.exIndex) || 0, 0, day.exercises.length - 1);
+        followSession.restDefault = clamp(Number(data.restDefault) || 75, 15, 300);
+      } catch (e) {
+        console.error("Could not load follow state", e);
+      }
+    }
+
+    function populateFollowDayOptions() {
+      const sel = document.getElementById("followDay");
+      sel.innerHTML = plan.map((day, idx) => `<option value="${idx}">${day.name}</option>`).join("");
+      sel.value = String(followSession.dayIndex);
+      document.getElementById("followRest").value = String(followSession.restDefault);
+    }
+
+    function findFirstUndoneIndex(dayIndex) {
+      const day = plan[dayIndex];
+      for (let i = 0; i < day.exercises.length; i += 1) {
+        const done = getRowField(day.id, i, "done");
+        if (!(done && done.checked)) return i;
+      }
+      return 0;
+    }
+
+    function renderFollowStep() {
+      followSession.dayIndex = clamp(followSession.dayIndex, 0, plan.length - 1);
+      const day = plan[followSession.dayIndex];
+      followSession.exIndex = clamp(followSession.exIndex, 0, day.exercises.length - 1);
+
+      const [exercise, target] = day.exercises[followSession.exIndex];
+      const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${exercise} exercise proper form`)}`;
+
+      document.getElementById("followDay").value = String(followSession.dayIndex);
+      document.getElementById("followDayName").textContent = day.name;
+      document.getElementById("followProgress").textContent = `Exercise ${followSession.exIndex + 1}/${day.exercises.length}`;
+      document.getElementById("followExercise").textContent = exercise;
+      document.getElementById("followTarget").textContent = target;
+      document.getElementById("followVideo").href = videoUrl;
+
+      syncFollowFromTable();
+      persistFollowState();
+    }
+
+    function updateFollowTimer() {
+      document.getElementById("followTimer").textContent = formatTimer(followSession.restLeft);
+    }
+
+    function stopFollowTimer() {
+      if (followSession.restTimer) {
+        clearInterval(followSession.restTimer);
+        followSession.restTimer = null;
+      }
+      document.getElementById("followTimerStart").textContent = "Start Rest";
+    }
+
+    function resetFollowTimer() {
+      stopFollowTimer();
+      followSession.restDefault = clamp(Number(document.getElementById("followRest").value) || 75, 15, 300);
+      followSession.restLeft = followSession.restDefault;
+      updateFollowTimer();
+      persistFollowState();
+    }
+
+    function toggleFollowTimer() {
+      if (followSession.restTimer) {
+        stopFollowTimer();
+        return;
+      }
+
+      if (followSession.restLeft <= 0) {
+        followSession.restLeft = followSession.restDefault;
+      }
+
+      document.getElementById("followTimerStart").textContent = "Pause";
+      followSession.restTimer = setInterval(() => {
+        followSession.restLeft -= 1;
+        if (followSession.restLeft <= 0) {
+          followSession.restLeft = 0;
+          stopFollowTimer();
+          if (navigator.vibrate) navigator.vibrate([140, 80, 140]);
+        }
+        updateFollowTimer();
+      }, 1000);
+    }
+
+    function openFollowMode() {
+      document.getElementById("focusMode").classList.add("active");
+      document.getElementById("focusMode").setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      renderFollowStep();
+      resetFollowTimer();
+    }
+
+    function closeFollowMode() {
+      stopFollowTimer();
+      syncTableFromFollow();
+      document.getElementById("focusMode").classList.remove("active");
+      document.getElementById("focusMode").setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function moveFollowStep({ markDone = false, direction = 1 } = {}) {
+      const { day } = getActiveExerciseMeta();
+      if (markDone) {
+        const doneEl = getRowField(day.id, followSession.exIndex, "done");
+        if (doneEl) doneEl.checked = true;
+      }
+
+      syncTableFromFollow();
+
+      const next = followSession.exIndex + direction;
+      if (next >= 0 && next < day.exercises.length) {
+        followSession.exIndex = next;
+        renderFollowStep();
+        return;
+      }
+
+      if (direction > 0) {
+        closeFollowMode();
+        alert(`${day.name} complete. Great work.`);
+      }
+    }
+
+    function registerServiceWorker() {
+      if (!("serviceWorker" in navigator)) return;
+      if (!location.protocol.startsWith("http")) return;
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(err => {
+          console.error("Service worker registration failed", err);
+        });
+      }, { once: true });
+    }
+
     function bindEvents() {
       document.getElementById("calcProtein").addEventListener("click", () => {
         calcProtein();
@@ -622,6 +1079,34 @@
       document.getElementById("saveNow").addEventListener("click", saveState);
       document.getElementById("clearWeek").addEventListener("click", clearWeek);
       document.getElementById("exportCsv").addEventListener("click", exportCsv);
+
+      document.getElementById("followStart").addEventListener("click", () => {
+        followSession.dayIndex = clamp(Number(document.getElementById("followDay").value) || 0, 0, plan.length - 1);
+        followSession.exIndex = findFirstUndoneIndex(followSession.dayIndex);
+        openFollowMode();
+      });
+      document.getElementById("followClose").addEventListener("click", closeFollowMode);
+      document.getElementById("followPrev").addEventListener("click", () => moveFollowStep({ direction: -1 }));
+      document.getElementById("followDoneNext").addEventListener("click", () => moveFollowStep({ markDone: true, direction: 1 }));
+      document.getElementById("followSkip").addEventListener("click", () => moveFollowStep({ direction: 1 }));
+
+      document.getElementById("followDay").addEventListener("change", e => {
+        followSession.dayIndex = clamp(Number(e.target.value) || 0, 0, plan.length - 1);
+        followSession.exIndex = findFirstUndoneIndex(followSession.dayIndex);
+        renderFollowStep();
+      });
+
+      document.getElementById("followRest").addEventListener("change", resetFollowTimer);
+      document.getElementById("followTimerStart").addEventListener("click", toggleFollowTimer);
+      document.getElementById("followTimerAdd").addEventListener("click", () => {
+        followSession.restLeft = clamp(followSession.restLeft + 15, 0, 1800);
+        updateFollowTimer();
+      });
+      document.getElementById("followTimerReset").addEventListener("click", resetFollowTimer);
+
+      ["followWeight", "followReps", "followPain", "followNotes"].forEach(id => {
+        document.getElementById(id).addEventListener("input", () => syncTableFromFollow());
+      });
 
       document.body.addEventListener("input", e => {
         const t = e.target;
@@ -640,12 +1125,17 @@
     function init() {
       renderDays();
       setCurrentWeek();
-      bindEvents();
       loadState();
+      loadFollowState();
+      populateFollowDayOptions();
+      resetFollowTimer();
+      renderFollowStep();
+      bindEvents();
       if (!document.getElementById("goal").value) {
         document.getElementById("goal").value = "recomp";
       }
       updateSummary();
+      registerServiceWorker();
     }
 
     init();
