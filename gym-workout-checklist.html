@@ -11,16 +11,16 @@
   <title>3-Day Gym Tracker</title>
   <style>
     :root {
-      --bg-1: #f8f4e8;
-      --bg-2: #eaf0f5;
-      --card: #fffdf9;
+      --bg-1: #eef7ff;
+      --bg-2: #eef7f2;
+      --card: #fffefb;
       --ink: #17222d;
       --muted: #4d5f72;
       --accent: #0e9f6e;
       --accent-2: #0b74b8;
-      --line: #d8e0e8;
+      --line: #cfe0ec;
       --danger: #c23a2b;
-      --shadow: 0 12px 30px rgba(16, 38, 56, 0.08);
+      --shadow: 0 14px 38px rgba(17, 48, 78, 0.12);
       --radius: 16px;
     }
 
@@ -33,9 +33,11 @@
       font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at 10% 10%, #ffe8b4 0%, transparent 35%),
-        radial-gradient(circle at 90% 20%, #d6f1e6 0%, transparent 28%),
-        linear-gradient(135deg, var(--bg-1), var(--bg-2));
+        radial-gradient(circle at 8% 8%, #ffd9ac 0%, transparent 38%),
+        radial-gradient(circle at 88% 6%, #c0e7ff 0%, transparent 33%),
+        radial-gradient(circle at 82% 88%, #c7f3df 0%, transparent 32%),
+        linear-gradient(145deg, #f9fcff, var(--bg-1) 45%, var(--bg-2));
+      background-attachment: fixed;
       min-height: 100vh;
       line-height: 1.4;
     }
@@ -68,6 +70,40 @@
       margin: 0 0 18px;
       color: var(--muted);
       font-size: 1rem;
+    }
+
+    .tab-switch {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(130px, 180px));
+      gap: 8px;
+      margin: 0 0 14px;
+    }
+
+    .tab-btn {
+      width: 100%;
+      border: 1px solid #c6d9e7;
+      background: #edf4fb;
+      color: #1c3a58;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 8px 12px;
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .tab-btn.active {
+      border-color: #1778b0;
+      background: linear-gradient(120deg, #15965f, #1778b0);
+      color: #ffffff;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+      animation: rise 0.2s ease;
     }
 
     .top-grid {
@@ -369,6 +405,27 @@
       gap: 8px;
     }
 
+    .history-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .history-meta {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .history-empty {
+      text-align: center;
+      color: #48637b;
+      padding: 14px 10px;
+    }
+
     .follow-card {
       margin-bottom: 14px;
     }
@@ -550,9 +607,10 @@
       z-index: 100;
       display: none;
       background:
-        radial-gradient(circle at 20% 20%, #ffe2a6 0%, transparent 40%),
-        radial-gradient(circle at 90% 10%, #cceffc 0%, transparent 34%),
-        linear-gradient(150deg, #f8f4e8, #eaf0f5);
+        radial-gradient(circle at 14% 16%, #ffd7a1 0%, transparent 38%),
+        radial-gradient(circle at 88% 8%, #bbe4ff 0%, transparent 32%),
+        radial-gradient(circle at 84% 86%, #c8f0de 0%, transparent 30%),
+        linear-gradient(155deg, #f9fcff, var(--bg-1) 48%, var(--bg-2));
       overflow: auto;
     }
 
@@ -599,6 +657,10 @@
       .wrap {
         margin-top: 10px;
         padding: 0 10px;
+      }
+
+      .tab-switch {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .card {
@@ -651,6 +713,12 @@
     <h1>3-Day Gym Checklist + Load Tracker</h1>
     <p class="subtitle">Goal: fat loss + muscle gain, while reducing heavy deadlift/squat loading until glute pain settles.</p>
 
+    <div class="tab-switch" role="tablist" aria-label="Workout views">
+      <button type="button" class="tab-btn active" data-tab-target="trackerTabPanel" role="tab" aria-selected="true">Workout</button>
+      <button type="button" class="tab-btn" data-tab-target="historyTabPanel" role="tab" aria-selected="false">History</button>
+    </div>
+
+    <section id="trackerTabPanel" class="tab-panel active">
     <section class="top-grid">
       <article class="card">
         <h2>Week Setup</h2>
@@ -784,6 +852,34 @@
     </section>
 
     <p class="footer-note">Data is stored locally in your browser (`localStorage`) on this device.</p>
+    </section>
+
+    <section id="historyTabPanel" class="tab-panel">
+      <article class="card">
+        <div class="history-head">
+          <h2>Completed Exercise History</h2>
+          <button type="button" class="btn secondary" id="clearExerciseHistory">Clear History</button>
+        </div>
+        <p class="history-meta" id="historyMeta">0 completed exercises saved.</p>
+        <div class="table-wrap" style="margin-top:10px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Completed</th>
+                <th>Week Of</th>
+                <th>Day</th>
+                <th>Exercise</th>
+                <th>Target</th>
+                <th>Result</th>
+                <th>Pain</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="exerciseHistoryBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
   </main>
 
   <section id="focusMode" class="focus-mode" aria-hidden="true">
@@ -929,6 +1025,8 @@
     const stateKey = "gymTrackerState_v1";
     const followStateKey = "gymTrackerFollowState_v1";
     const effortStateKey = "gymEffortHistory_v1";
+    const exerciseHistoryStateKey = "gymExerciseHistory_v1";
+    const activeTabStateKey = "gymActiveTab_v1";
     const followSession = {
       dayIndex: 0,
       exIndex: 0,
@@ -943,6 +1041,7 @@
       timedTimer: null
     };
     let effortHistory = [];
+    let exerciseHistory = [];
 
     function createRow(dayId, idx, exercise, target) {
       const rowId = `${dayId}_${idx}`;
@@ -1666,6 +1765,7 @@
       if (markDone) {
         const doneEl = getRowField(day.id, followSession.exIndex, "done");
         if (doneEl) doneEl.checked = true;
+        upsertCompletedExerciseHistory(day.id, followSession.exIndex, "follow");
       }
 
       syncTableFromFollow();
@@ -1707,6 +1807,195 @@
 
     function getDayById(dayId) {
       return plan.find(day => day.id === dayId);
+    }
+
+    function setActiveTab(tabId) {
+      const chosen = tabId === "historyTabPanel" ? "historyTabPanel" : "trackerTabPanel";
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        const active = btn.dataset.tabTarget === chosen;
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-selected", active ? "true" : "false");
+      });
+      document.querySelectorAll(".tab-panel").forEach(panel => {
+        panel.classList.toggle("active", panel.id === chosen);
+      });
+      localStorage.setItem(activeTabStateKey, chosen);
+    }
+
+    function loadActiveTab() {
+      const saved = localStorage.getItem(activeTabStateKey);
+      setActiveTab(saved);
+    }
+
+    function getCurrentWeekOf() {
+      const week = document.getElementById("weekOf")?.value || "";
+      return week || "-";
+    }
+
+    function parseDoneFieldKey(key) {
+      const raw = String(key || "");
+      if (!raw.endsWith("_done")) return null;
+      const base = raw.slice(0, -5);
+      const split = base.lastIndexOf("_");
+      if (split < 0) return null;
+      const dayId = base.slice(0, split);
+      const exerciseIndex = Number(base.slice(split + 1));
+      if (!dayId || !Number.isInteger(exerciseIndex) || exerciseIndex < 0) return null;
+      return { dayId, exerciseIndex };
+    }
+
+    function formatDateTime(iso) {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return "-";
+      return d.toLocaleString([], {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function buildExerciseHistoryEntry(dayId, idx, source = "manual") {
+      const day = getDayById(dayId);
+      if (!day || !day.exercises[idx]) return null;
+
+      const [exercise, target] = day.exercises[idx];
+      const weekOf = getCurrentWeekOf();
+      const timed = isTimedExercise(exercise, target);
+      const weight = (getRowField(dayId, idx, "weight")?.value || "").trim();
+      const reps = (getRowField(dayId, idx, "reps")?.value || "").trim();
+      const pain = (getRowField(dayId, idx, "pain")?.value || "").trim();
+      const notes = (getRowField(dayId, idx, "notes")?.value || "").trim();
+      const sets = readSetsFromRow(dayId, idx);
+
+      let result = "";
+      if (timed) {
+        const minutes = parseMinutesFromText(reps) || parseMinutesFromText(target);
+        result = minutes ? `${minutes} min` : `Target ${target}`;
+      } else {
+        const chunks = [];
+        if (weight) chunks.push(`${weight} kg`);
+        if (reps) chunks.push(`${reps} reps`);
+        result = chunks.join(" / ");
+      }
+      if (!result) result = summarizeSets(sets);
+
+      return {
+        id: `${weekOf}|${dayId}|${idx}`,
+        weekOf,
+        dayId,
+        dayName: day.name,
+        exerciseIndex: idx,
+        exercise,
+        target,
+        result,
+        pain,
+        notes,
+        source,
+        completedAt: new Date().toISOString()
+      };
+    }
+
+    function loadExerciseHistory() {
+      const raw = localStorage.getItem(exerciseHistoryStateKey);
+      if (!raw) {
+        exerciseHistory = [];
+        return;
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        exerciseHistory = Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error("Could not load exercise history", e);
+        exerciseHistory = [];
+      }
+    }
+
+    function saveExerciseHistory() {
+      localStorage.setItem(exerciseHistoryStateKey, JSON.stringify(exerciseHistory));
+    }
+
+    function renderExerciseHistory() {
+      const body = document.getElementById("exerciseHistoryBody");
+      const meta = document.getElementById("historyMeta");
+      const rows = [...exerciseHistory].sort((a, b) => {
+        const ta = Date.parse(a.completedAt || 0);
+        const tb = Date.parse(b.completedAt || 0);
+        return tb - ta;
+      });
+
+      meta.textContent = `${rows.length} completed exercise${rows.length === 1 ? "" : "s"} saved.`;
+
+      if (!rows.length) {
+        body.innerHTML = `<tr><td colspan="8" class="history-empty">No completed exercises yet. Mark exercises as done to build your history.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = rows.map(item => `
+        <tr>
+          <td>${escapeHtml(formatDateTime(item.completedAt))}</td>
+          <td>${escapeHtml(item.weekOf || "-")}</td>
+          <td>${escapeHtml(item.dayName || item.dayId || "-")}</td>
+          <td>${escapeHtml(item.exercise || "-")}</td>
+          <td>${escapeHtml(item.target || "-")}</td>
+          <td>${escapeHtml(item.result || "-")}</td>
+          <td>${escapeHtml(item.pain || "-")}</td>
+          <td>${escapeHtml(item.notes || "-")}</td>
+        </tr>
+      `).join("");
+    }
+
+    function upsertCompletedExerciseHistory(dayId, idx, source = "manual") {
+      const entry = buildExerciseHistoryEntry(dayId, idx, source);
+      if (!entry) return;
+
+      const existingIdx = exerciseHistory.findIndex(item => item.id === entry.id);
+      if (existingIdx >= 0) {
+        entry.completedAt = exerciseHistory[existingIdx].completedAt || entry.completedAt;
+        exerciseHistory[existingIdx] = entry;
+      } else {
+        exerciseHistory.push(entry);
+      }
+      saveExerciseHistory();
+      renderExerciseHistory();
+    }
+
+    function removeCompletedExerciseHistoryForCurrentWeek(dayId, idx) {
+      const historyId = `${getCurrentWeekOf()}|${dayId}|${idx}`;
+      const next = exerciseHistory.filter(item => item.id !== historyId);
+      if (next.length === exerciseHistory.length) return;
+      exerciseHistory = next;
+      saveExerciseHistory();
+      renderExerciseHistory();
+    }
+
+    function syncCompletedHistoryFromCurrentState() {
+      let changed = false;
+      const weekOf = getCurrentWeekOf();
+      plan.forEach(day => {
+        day.exercises.forEach((_, idx) => {
+          const done = getRowField(day.id, idx, "done");
+          if (!(done && done.checked)) return;
+          const historyId = `${weekOf}|${day.id}|${idx}`;
+          const exists = exerciseHistory.some(item => item.id === historyId);
+          if (exists) return;
+          const entry = buildExerciseHistoryEntry(day.id, idx, "sync");
+          if (!entry) return;
+          exerciseHistory.push(entry);
+          changed = true;
+        });
+      });
+      if (!changed) return;
+      saveExerciseHistory();
+      renderExerciseHistory();
+    }
+
+    function clearExerciseHistory() {
+      if (!confirm("Clear all completed exercise history?")) return;
+      exerciseHistory = [];
+      saveExerciseHistory();
+      renderExerciseHistory();
     }
 
     function setEffortDateTodayIfEmpty() {
@@ -1936,6 +2225,7 @@
     function prefillEffortFromCompletedDay(dayIndex) {
       const day = plan[dayIndex];
       if (!day) return;
+      setActiveTab("trackerTabPanel");
       setEffortDateTodayIfEmpty();
       document.getElementById("effortDay").value = day.id;
       document.getElementById("effortTotalMin").value = String(estimateDayTotalMinutes(dayIndex));
@@ -1953,6 +2243,11 @@
     }
 
     function bindEvents() {
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => setActiveTab(btn.dataset.tabTarget));
+      });
+      document.getElementById("clearExerciseHistory").addEventListener("click", clearExerciseHistory);
+
       document.getElementById("calcProtein").addEventListener("click", () => {
         calcProtein();
         saveState();
@@ -2027,6 +2322,16 @@
 
       document.body.addEventListener("change", e => {
         const t = e.target;
+        if (t.matches(".done[data-k$='_done']")) {
+          const parsed = parseDoneFieldKey(t.dataset.k);
+          if (parsed) {
+            if (t.checked) {
+              upsertCompletedExerciseHistory(parsed.dayId, parsed.exerciseIndex, "manual");
+            } else {
+              removeCompletedExerciseHistoryForCurrentWeek(parsed.dayId, parsed.exerciseIndex);
+            }
+          }
+        }
         if (t.matches("[data-k], #weekOf, #bw, #goal")) {
           saveState();
         }
@@ -2044,6 +2349,10 @@
       setEffortDateTodayIfEmpty();
       loadEffortHistory();
       renderEffortDashboard();
+      loadExerciseHistory();
+      syncCompletedHistoryFromCurrentState();
+      renderExerciseHistory();
+      loadActiveTab();
       resetFollowTimer();
       resetSessionTimer();
       resetExerciseTimer();
