@@ -791,6 +791,12 @@
           <div class="full" id="followTimedBlock" style="display:none;">
             <label for="followDurationMin">Duration (min)</label>
             <input type="number" id="followDurationMin" min="1" max="180" step="1" placeholder="e.g., 12" />
+            <div class="set-buttons">
+              <button class="btn secondary" data-duration="5">5 min</button>
+              <button class="btn secondary" data-duration="10">10 min</button>
+              <button class="btn secondary" data-duration="12">12 min</button>
+              <button class="btn secondary" data-duration="15">15 min</button>
+            </div>
           </div>
           <div>
             <label for="followPain">Pain (0-10)</label>
@@ -891,6 +897,13 @@
     function createRow(dayId, idx, exercise, target) {
       const rowId = `${dayId}_${idx}`;
       const setKey = `${rowId}_setsjson`;
+      const timed = isTimedExercise(exercise, target);
+      const summaryText = timed ? `Duration: ${target}` : "Sets: not logged";
+      const repsMax = timed ? 300 : 200;
+      const repsPlaceholder = timed ? "min" : "e.g., 10";
+      const weightCell = timed
+        ? `<input type="text" data-k="${rowId}_weight" placeholder="-" disabled />`
+        : `<input type="text" inputmode="decimal" data-k="${rowId}_weight" placeholder="kg" />`;
       const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${exercise} exercise proper form`)}`;
       return `
         <tr>
@@ -898,12 +911,12 @@
           <td>
             <div class="exercise">${exercise}</div>
             <a class="video-link" href="${videoUrl}" target="_blank" rel="noopener noreferrer">Video</a>
-            <div class="set-inline" data-set-summary="${setKey}">Sets: not logged</div>
+            <div class="set-inline" data-set-summary="${setKey}">${summaryText}</div>
             <input type="hidden" data-k="${setKey}" value="[]" />
           </td>
           <td class="small">${target}</td>
-          <td><input type="text" inputmode="decimal" data-k="${rowId}_weight" placeholder="kg" /></td>
-          <td><input type="number" min="0" max="200" step="1" inputmode="numeric" data-k="${rowId}_reps" placeholder="e.g., 10" /></td>
+          <td>${weightCell}</td>
+          <td><input type="number" min="0" max="${repsMax}" step="1" inputmode="numeric" data-k="${rowId}_reps" placeholder="${repsPlaceholder}" /></td>
           <td><input type="number" class="pain" min="0" max="10" inputmode="numeric" data-k="${rowId}_pain" placeholder="0-10" /></td>
           <td><textarea data-k="${rowId}_notes" placeholder="tempo, RIR, cues..."></textarea></td>
         </tr>
@@ -929,7 +942,7 @@
                   <th>Exercise</th>
                   <th>Target</th>
                   <th>Weight</th>
-                  <th>Reps</th>
+                  <th>Reps/Min</th>
                   <th>Pain</th>
                   <th>Notes</th>
                 </tr>
@@ -1803,6 +1816,13 @@
         document.getElementById(id).addEventListener("input", () => syncTableFromFollow());
       });
       document.getElementById("followDurationMin").addEventListener("input", () => syncTableFromFollow());
+      document.getElementById("followTimedBlock").addEventListener("click", e => {
+        const btn = e.target.closest("button[data-duration]");
+        if (!btn) return;
+        e.preventDefault();
+        document.getElementById("followDurationMin").value = btn.dataset.duration || "";
+        syncTableFromFollow();
+      });
       document.getElementById("followSetsList").addEventListener("input", () => syncTableFromFollow());
       document.getElementById("followSetsList").addEventListener("change", () => syncTableFromFollow());
 
