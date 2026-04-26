@@ -233,6 +233,7 @@
       text-align: left;
       vertical-align: top;
       font-size: 0.9rem;
+      transition: background-color 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
     }
 
     th {
@@ -257,6 +258,16 @@
 
     .exercise {
       font-weight: 700;
+    }
+
+    tr.row-done td {
+      opacity: 0.45;
+      background: #f4f7fa;
+    }
+
+    tr.row-active td {
+      background: #e8fff3;
+      border-bottom-color: #9ed9b8;
     }
 
     .video-link {
@@ -392,6 +403,19 @@
       background: #ffffff;
       border-radius: 10px;
       padding: 8px;
+      transition: background-color 0.18s ease, opacity 0.18s ease, border-color 0.18s ease;
+    }
+
+    .follow-set-row.set-done {
+      opacity: 0.5;
+      background: #f3f7fb;
+      border-color: #dbe5ef;
+    }
+
+    .follow-set-row.set-active {
+      background: #e9fff4;
+      border-color: #9dd8b8;
+      box-shadow: 0 0 0 2px rgba(14, 159, 110, 0.12);
     }
 
     .set-tag {
@@ -874,6 +898,7 @@
       if (document.getElementById("focusMode")?.classList.contains("active")) {
         updateFollowDoneState();
       }
+      updateExerciseRowVisualStates();
     }
 
     function calcProtein() {
@@ -1023,6 +1048,31 @@
       });
     }
 
+    function updateExerciseRowVisualStates() {
+      document.querySelectorAll("tr.row-done, tr.row-active").forEach(row => {
+        row.classList.remove("row-done", "row-active");
+      });
+
+      plan.forEach(day => {
+        day.exercises.forEach((_, idx) => {
+          const done = getRowField(day.id, idx, "done");
+          const row = done?.closest("tr");
+          if (!row) return;
+          if (done.checked) row.classList.add("row-done");
+        });
+      });
+
+      const isFocusOpen = document.getElementById("focusMode")?.classList.contains("active");
+      if (!isFocusOpen) return;
+
+      const { day } = getActiveExerciseMeta();
+      const activeDone = getRowField(day.id, followSession.exIndex, "done");
+      const activeRow = activeDone?.closest("tr");
+      if (!activeRow) return;
+      activeRow.classList.remove("row-done");
+      activeRow.classList.add("row-active");
+    }
+
     function escapeHtml(value) {
       return String(value)
         .replaceAll("&", "&amp;")
@@ -1042,6 +1092,23 @@
           <label class="set-check"><input type="checkbox" data-set-field="done" ${set.done ? "checked" : ""} />Done</label>
         </div>
       `).join("");
+      updateFollowSetVisualStates();
+    }
+
+    function updateFollowSetVisualStates() {
+      const rows = Array.from(document.querySelectorAll("#followSetsList .follow-set-row"));
+      if (!rows.length) return;
+
+      rows.forEach(row => row.classList.remove("set-done", "set-active"));
+
+      rows.forEach(row => {
+        const done = row.querySelector('[data-set-field="done"]')?.checked;
+        if (done) row.classList.add("set-done");
+      });
+
+      let activeRow = rows.find(row => !row.querySelector('[data-set-field="done"]')?.checked);
+      if (!activeRow) activeRow = rows[rows.length - 1];
+      activeRow.classList.add("set-active");
     }
 
     function readFollowSetsFromUi() {
@@ -1088,6 +1155,7 @@
     function syncTableFromFollow(save = true) {
       const { day } = getActiveExerciseMeta();
       const sets = writeSetsToRow(day.id, followSession.exIndex, readFollowSetsFromUi());
+      updateFollowSetVisualStates();
       const loggedSets = sets.filter(s => s.done || s.weight || s.reps);
       const lastWeight = [...loggedSets].reverse().find(s => s.weight)?.weight || "";
       const repsCsv = loggedSets.map(s => s.reps).filter(Boolean).join(",");
@@ -1162,6 +1230,7 @@
 
       syncFollowFromTable();
       persistFollowState();
+      updateExerciseRowVisualStates();
     }
 
     function updateFollowTimer() {
@@ -1220,6 +1289,7 @@
       document.getElementById("focusMode").classList.remove("active");
       document.getElementById("focusMode").setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
+      updateExerciseRowVisualStates();
     }
 
     function moveFollowStep({ markDone = false, direction = 1 } = {}) {
