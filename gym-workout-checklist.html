@@ -469,6 +469,13 @@
       grid-column: 1 / -1;
     }
 
+    .follow-session-controls {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      gap: 8px;
+    }
+
     .follow-panel {
       margin-top: 10px;
       border: 1px solid var(--line);
@@ -803,6 +810,10 @@
         grid-template-columns: 1fr;
       }
 
+      .follow-session-controls {
+        grid-template-columns: 1fr;
+      }
+
       .follow-actions {
         grid-template-columns: 1fr;
       }
@@ -909,9 +920,9 @@
     </section>
 
     <section class="card follow-card">
-      <h2>Follow-Along Mode (Mobile)</h2>
+      <h2>Session Control (Mobile)</h2>
       <div class="follow-top">
-        <p>Run one exercise at a time with large controls and a built-in rest timer.</p>
+        <p>Use Start, Pause, and Stop from here. Start takes you directly to the exercise flow.</p>
         <div>
           <label for="followDay">Workout Day</label>
           <select id="followDay"></select>
@@ -920,8 +931,10 @@
           <label for="followRest">Rest Timer (sec)</label>
           <input type="number" id="followRest" min="15" max="300" step="5" value="75" />
         </div>
-        <div>
-          <button class="btn" id="followStart">Start Follow-Along</button>
+        <div class="follow-session-controls">
+          <button class="btn" id="followStart">Start</button>
+          <button class="btn secondary" id="followPauseMain">Pause</button>
+          <button class="btn secondary" id="followStopMain">Stop</button>
         </div>
       </div>
       <p class="mobile-note">iPhone install: Safari -> Share -> Add to Home Screen.</p>
@@ -1047,10 +1060,6 @@
       <div class="focus-head">
         <div class="focus-head-main">
           <h2 id="followDayName">Follow-Along Session</h2>
-          <div class="session-top">
-            <span class="session-label">Session</span>
-            <span class="session-time" id="followSessionTimer">00:00</span>
-          </div>
         </div>
         <div class="focus-head-controls">
           <button class="btn" id="followSessionStart">Start</button>
@@ -1877,7 +1886,8 @@
     }
 
     function updateSessionTimer() {
-      document.getElementById("followSessionTimer").textContent = formatTimer(followSession.sessionElapsed);
+      const el = document.getElementById("followSessionTimer");
+      if (el) el.textContent = formatTimer(followSession.sessionElapsed);
     }
 
     function stopSessionTimer() {
@@ -2572,7 +2582,10 @@
         followSession.dayIndex = clamp(Number(document.getElementById("followDay").value) || 0, 0, plan.length - 1);
         followSession.exIndex = findFirstUndoneIndex(followSession.dayIndex);
         openFollowMode();
+        startFollowSession();
       });
+      document.getElementById("followPauseMain").addEventListener("click", pauseFollowSession);
+      document.getElementById("followStopMain").addEventListener("click", stopFollowSession);
       document.getElementById("followDoneNext").addEventListener("click", completeCurrentExercise);
       document.getElementById("followTransitionNext").addEventListener("click", handleTransitionPrimaryAction);
 
