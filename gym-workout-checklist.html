@@ -1615,6 +1615,15 @@
         return;
       }
 
+      const isFreshRest = followSession.restLeft === followSession.restDefault || followSession.restLeft <= 0;
+      if (isFreshRest) {
+        // Starting a new rest block means the previous exercise is finished.
+        resetExerciseTimer(false);
+        stopTimedCountdown();
+        followSession.timedLeft = 0;
+        updateTimedCountdown();
+      }
+
       if (followSession.restLeft <= 0) {
         followSession.restLeft = followSession.restDefault;
       }
