@@ -414,6 +414,22 @@
       font-weight: 700;
     }
 
+    .demo-link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .pill-btn.demo-link {
+      text-decoration: none;
+      display: inline-block;
+      padding: 5px 9px;
+      background: #e4f0ff;
+      border-color: #b7cde6;
+      color: #18486b;
+    }
+
     .community-post {
       border: 1px solid #cadad7;
       border-radius: 12px;
@@ -1434,6 +1450,49 @@
       return String(v || "").trim().toLowerCase();
     }
 
+    function demoPartsForExercise(exerciseName) {
+      const cleaned = String(exerciseName || "")
+        .replace(/^superset:\s*/i, "")
+        .replace(/^tri-set:\s*/i, "")
+        .replace(/\|.*$/g, "")
+        .trim();
+
+      if (!cleaned) return [];
+
+      const parts = cleaned
+        .split(/\s+\+\s+|\/|(?:\s+or\s+)/i)
+        .map(part => part.replace(/\([^)]*\)/g, "").trim())
+        .filter(Boolean);
+
+      return [...new Set(parts)].slice(0, 3);
+    }
+
+    function demoVideoUrlForExercise(exerciseName) {
+      const name = normalizeText(exerciseName);
+
+      let query = `${exerciseName} exercise demo proper form`;
+      if (name.includes("cardio warm-up")) {
+        query = "cardio warm up treadmill bike rower exercise demo";
+      } else if (name.includes("stretching") || name.includes("cooldown")) {
+        query = "full body stretching cooldown routine demo";
+      }
+
+      return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}&sp=EgIQAQ%3D%3D`;
+    }
+
+    function renderDemoLinksForExercise(exerciseName) {
+      const parts = demoPartsForExercise(exerciseName);
+      if (!parts.length) return "";
+
+      const links = parts.map(part => `
+        <a class="pill-btn demo-link" href="${demoVideoUrlForExercise(part)}" target="_blank" rel="noopener noreferrer">
+          Demo Video: ${escapeHtml(part)}
+        </a>
+      `).join("");
+
+      return `<div class="demo-link-row">${links}</div>`;
+    }
+
     function setActiveTab(tabId) {
       document.querySelectorAll(".panel").forEach(panel => {
         panel.classList.toggle("active", panel.id === tabId);
@@ -2000,11 +2059,13 @@
           const label = state.session.setsDone[key] ? "Done" : "Pending";
           return `<button class="set-tag ${done}" data-set-toggle="${key}"><span>Set ${setIdx + 1}</span><span>${label}</span></button>`;
         }).join("");
+        const demoLinks = renderDemoLinksForExercise(ex.name);
 
         return `
           <article class="exercise-item">
             <strong>${exIndex + 1}. ${ex.name}</strong>
             <div class="small">Target: ${ex.target} · ${ex.sets} sets</div>
+            ${demoLinks}
             <div class="set-grid">${sets}</div>
           </article>
         `;
