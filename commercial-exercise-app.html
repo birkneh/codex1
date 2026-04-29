@@ -1,0 +1,2613 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#156f63" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="PulseForge" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>PulseForge Commercial Fitness App</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=DM+Serif+Display:ital@0;1&display=swap");
+
+    :root {
+      --bg-ink: #101d24;
+      --bg-soft: #e9f4f1;
+      --paper: #fcfffd;
+      --ink: #112028;
+      --muted: #48606c;
+      --line: #bfd3cf;
+      --teal: #156f63;
+      --teal-2: #20a589;
+      --amber: #ffb347;
+      --coral: #ee6d4f;
+      --blue: #2b6cb0;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --shadow: 0 18px 44px rgba(20, 48, 44, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 12%, #f8ce95 0%, transparent 28%),
+        radial-gradient(circle at 88% 10%, #bae9da 0%, transparent 35%),
+        radial-gradient(circle at 86% 86%, #b8daff 0%, transparent 30%),
+        linear-gradient(140deg, #f9fffd, #e7f5f1 44%, #edf5ff);
+      min-height: 100vh;
+      line-height: 1.4;
+    }
+
+    .app {
+      max-width: 1240px;
+      margin: 22px auto 28px;
+      padding: 0 14px;
+      animation: rise 0.45s ease;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero {
+      border-radius: var(--radius-lg);
+      border: 1px solid #d4e3df;
+      background:
+        linear-gradient(126deg, rgba(19, 116, 102, 0.95), rgba(29, 130, 167, 0.9)),
+        linear-gradient(120deg, #117260, #2078b0);
+      color: #f3fcff;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -90px -120px auto;
+      width: 250px;
+      aspect-ratio: 1;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      transform: rotate(18deg);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      letter-spacing: 0.01em;
+      font-weight: 400;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      max-width: 850px;
+      color: rgba(243, 252, 255, 0.93);
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .kpi {
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      border-radius: 14px;
+      background: rgba(12, 44, 52, 0.2);
+      padding: 10px 12px;
+      min-height: 70px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .kpi .label {
+      font-size: 0.8rem;
+      opacity: 0.88;
+    }
+
+    .kpi .value {
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .tabs {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .tab-btn {
+      border: 1px solid #b7cbc8;
+      background: #eaf4f2;
+      color: #1d4451;
+      border-radius: 999px;
+      padding: 10px 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.14s ease, filter 0.14s ease, background-color 0.14s ease;
+    }
+
+    .tab-btn.active {
+      color: #fff;
+      border-color: #19726a;
+      background: linear-gradient(120deg, #177a69, #2877b7);
+    }
+
+    .tab-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.02);
+    }
+
+    .panel {
+      display: none;
+      margin-top: 14px;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 1.04rem;
+    }
+
+    .card p {
+      margin: 6px 0;
+      color: var(--muted);
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-8 { grid-column: span 8; }
+    .col-7 { grid-column: span 7; }
+    .col-6 { grid-column: span 6; }
+    .col-5 { grid-column: span 5; }
+    .col-4 { grid-column: span 4; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.83rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      width: 100%;
+      border: 1px solid #c4d8d4;
+      border-radius: 10px;
+      padding: 9px 10px;
+      font: inherit;
+      color: var(--ink);
+      background: #ffffff;
+    }
+
+    textarea {
+      min-height: 78px;
+      resize: vertical;
+    }
+
+    .btn {
+      border: none;
+      background: linear-gradient(120deg, #167864, #2877b7);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.14s ease, filter 0.14s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+    }
+
+    .btn.secondary {
+      border: 1px solid #bfd2cf;
+      background: #edf5f3;
+      color: #1f4350;
+    }
+
+    .btn.warn {
+      background: linear-gradient(120deg, #d7722f, #d14a42);
+    }
+
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .chip {
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #e8f3f0;
+      border: 1px solid #c3d8d2;
+      color: #1f4a58;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .notice {
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid #edd5b6;
+      background: #fff5e7;
+      color: #6f5035;
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+
+    .dual {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 8px;
+    }
+
+    .meter {
+      height: 9px;
+      border-radius: 999px;
+      background: #e2ece9;
+      overflow: hidden;
+      border: 1px solid #cbdbd8;
+    }
+
+    .meter > span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(120deg, #169271, #2a7bc3);
+      width: 0;
+      transition: width 0.2s ease;
+    }
+
+    .session-clock {
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: clamp(2rem, 6vw, 3.1rem);
+      line-height: 1;
+      letter-spacing: 0.03em;
+      color: #14495b;
+    }
+
+    .exercise-item {
+      border: 1px solid #c8d9d6;
+      border-radius: 12px;
+      padding: 8px;
+      background: #fbfefd;
+      display: grid;
+      gap: 7px;
+    }
+
+    .set-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+      gap: 6px;
+    }
+
+    .set-tag {
+      border: 1px solid #c4d8d3;
+      border-radius: 9px;
+      font-size: 0.79rem;
+      padding: 6px;
+      background: #f2f8f6;
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .set-tag.done {
+      background: #dff4eb;
+      border-color: #7ec9ad;
+      color: #145543;
+      font-weight: 700;
+    }
+
+    .list-scroll {
+      max-height: 330px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 560px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #d5e3e0;
+      text-align: left;
+      padding: 8px;
+      font-size: 0.88rem;
+      vertical-align: top;
+    }
+
+    th {
+      color: #204f5d;
+      background: #edf5f3;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .plan-day {
+      border: 1px solid #c8d9d6;
+      border-radius: 12px;
+      padding: 10px;
+      background: #f8fcfb;
+      display: grid;
+      gap: 4px;
+    }
+
+    .plan-day strong {
+      color: #153f52;
+    }
+
+    .small {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .pill-btn {
+      border: 1px solid #bfd5d1;
+      border-radius: 999px;
+      background: #edf6f4;
+      color: #1f4652;
+      cursor: pointer;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .community-post {
+      border: 1px solid #cadad7;
+      border-radius: 12px;
+      background: #f9fdfc;
+      padding: 9px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .community-post .meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .chart {
+      width: 100%;
+      height: 132px;
+      border: 1px solid #d4e1de;
+      border-radius: 12px;
+      background: #fbfdfd;
+    }
+
+    .tab-footer {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 70;
+      background: rgba(245, 252, 250, 0.95);
+      border-top: 1px solid #c7d9d5;
+      backdrop-filter: blur(8px);
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .mobile-nav .tab-btn {
+      padding: 8px 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1080px) {
+      .col-8, .col-7, .col-6, .col-5, .col-4 {
+        grid-column: span 12;
+      }
+
+      .tabs {
+        display: none;
+      }
+
+      .mobile-nav {
+        display: grid;
+      }
+
+      .app {
+        margin-bottom: 92px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hero {
+        padding: 14px;
+      }
+
+      .hero h1 {
+        font-size: clamp(1.7rem, 8vw, 2.3rem);
+      }
+
+      .tab-footer {
+        grid-template-columns: 1fr;
+      }
+
+      .dual {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <h1>PulseForge Training OS</h1>
+      <p>
+        Commercial-grade workout planning, guided sessions, nutrition analytics, recovery intelligence,
+        and community accountability in one installable app.
+      </p>
+      <div class="kpis">
+        <article class="kpi"><div class="label">Current Streak</div><div class="value" id="kpiStreak">0 days</div></article>
+        <article class="kpi"><div class="label">This Week</div><div class="value" id="kpiWeek">0 / 0 sessions</div></article>
+        <article class="kpi"><div class="label">Readiness</div><div class="value" id="kpiReadiness">No check-in</div></article>
+        <article class="kpi"><div class="label">Personal Best</div><div class="value" id="kpiBest">-</div></article>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Main tabs">
+      <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="tab-btn" data-tab="planner">Planner</button>
+      <button class="tab-btn" data-tab="session">Session</button>
+      <button class="tab-btn" data-tab="nutrition">Nutrition</button>
+      <button class="tab-btn" data-tab="progress">Progress</button>
+      <button class="tab-btn" data-tab="community">Community</button>
+    </nav>
+
+    <section id="dashboard" class="panel active">
+      <div class="grid">
+        <article class="card col-7">
+          <h2>Weekly Momentum</h2>
+          <p>Inspired by Apple Fitness+ Custom Plans, Strava goals, and Peloton streak metrics.</p>
+          <div class="stack">
+            <div>
+              <div class="dual">
+                <div><strong>Workout Completion</strong> <span class="small" id="dashSessionText">0%</span></div>
+                <div class="small" id="dashSessionMeta">0 of 0 sessions</div>
+              </div>
+              <div class="meter"><span id="dashSessionBar"></span></div>
+            </div>
+            <div>
+              <div class="dual">
+                <div><strong>Hydration Consistency</strong> <span class="small" id="dashHydrationText">0%</span></div>
+                <div class="small" id="dashHydrationMeta">0 days at goal</div>
+              </div>
+              <div class="meter"><span id="dashHydrationBar"></span></div>
+            </div>
+            <div>
+              <div class="dual">
+                <div><strong>Challenge Progress</strong> <span class="small" id="dashChallengeText">0%</span></div>
+                <div class="small" id="dashChallengeMeta">No active challenge</div>
+              </div>
+              <div class="meter"><span id="dashChallengeBar"></span></div>
+            </div>
+          </div>
+          <div class="chip-row" id="dashHighlights"></div>
+        </article>
+
+        <article class="card col-5">
+          <h2>Daily Recovery Check-In</h2>
+          <p>Fitbod-style readiness signal using sleep, soreness, and stress.</p>
+          <div class="form-grid">
+            <div>
+              <label for="recoveryDate">Date</label>
+              <input id="recoveryDate" type="date" />
+            </div>
+            <div>
+              <label for="sleepHours">Sleep (hours)</label>
+              <input id="sleepHours" type="number" min="0" max="14" step="0.1" placeholder="e.g. 7.5" />
+            </div>
+            <div>
+              <label for="sorenessScore">Soreness (1-10)</label>
+              <input id="sorenessScore" type="number" min="1" max="10" step="1" placeholder="e.g. 4" />
+            </div>
+            <div>
+              <label for="stressScore">Stress (1-10)</label>
+              <input id="stressScore" type="number" min="1" max="10" step="1" placeholder="e.g. 3" />
+            </div>
+            <div>
+              <label for="recoveryNote">Note</label>
+              <input id="recoveryNote" type="text" placeholder="Travel day, poor sleep, etc." />
+            </div>
+            <div>
+              <button class="btn" id="saveRecovery">Save Check-In</button>
+            </div>
+          </div>
+          <div class="chip-row" id="recoveryBadge"></div>
+        </article>
+
+        <article class="card col-6">
+          <h2>Active Challenges</h2>
+          <p>Peloton/Strava-style accountability with weekly and consistency targets.</p>
+          <div id="challengeList" class="stack"></div>
+        </article>
+
+        <article class="card col-6">
+          <h2>Profile Snapshot</h2>
+          <p id="profileSnapshot">Set up your profile in Planner to unlock personalized AI-style programming.</p>
+          <div class="notice">Health and training guidance here is informational only and not medical advice.</div>
+          <div class="chip-row">
+            <button class="pill-btn" data-go-tab="planner">Open Planner</button>
+            <button class="pill-btn" data-go-tab="session">Open Session</button>
+            <button class="pill-btn" data-go-tab="nutrition">Open Nutrition</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="planner" class="panel">
+      <div class="grid">
+        <article class="card col-7">
+          <h2>Onboarding + Smart Plan Generator</h2>
+          <p>Combines commercial patterns: goals, equipment adaptation, preferred workout types, and scheduled reminders.</p>
+          <div class="form-grid">
+            <div>
+              <label for="profileName">Name</label>
+              <input id="profileName" type="text" placeholder="Your name" />
+            </div>
+            <div>
+              <label for="profileAge">Age</label>
+              <input id="profileAge" type="number" min="12" max="99" step="1" placeholder="e.g. 31" />
+            </div>
+            <div>
+              <label for="profileWeight">Weight (kg)</label>
+              <input id="profileWeight" type="number" min="30" max="300" step="0.1" placeholder="e.g. 76" />
+            </div>
+            <div>
+              <label for="profileHeight">Height (cm)</label>
+              <input id="profileHeight" type="number" min="120" max="230" step="1" placeholder="e.g. 176" />
+            </div>
+            <div>
+              <label for="profileGoal">Primary Goal</label>
+              <select id="profileGoal">
+                <option value="recomp">Fat loss + muscle gain</option>
+                <option value="muscle">Build muscle</option>
+                <option value="fat_loss">Lose fat</option>
+                <option value="endurance">Build endurance</option>
+                <option value="mobility">Mobility + recovery</option>
+              </select>
+            </div>
+            <div>
+              <label for="profileExperience">Experience</label>
+              <select id="profileExperience">
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+            <div>
+              <label for="profileDays">Training Days / Week (Fixed)</label>
+              <input id="profileDays" type="number" min="3" max="3" step="1" value="3" readonly />
+            </div>
+            <div>
+              <label for="profileDuration">Preferred Session (min)</label>
+              <input id="profileDuration" type="number" min="15" max="120" step="5" value="45" />
+            </div>
+            <div>
+              <label for="profileWeeklyTarget">Weekly Session Target (Fixed)</label>
+              <input id="profileWeeklyTarget" type="number" min="3" max="3" step="1" value="3" readonly />
+            </div>
+            <div>
+              <label for="profileReminderHour">Reminder Hour</label>
+              <input id="profileReminderHour" type="time" value="18:30" />
+            </div>
+            <div>
+              <label>Equipment Available</label>
+              <div class="small">Pick everything you can use this month.</div>
+              <div class="chip-row" id="equipmentChoices"></div>
+            </div>
+            <div>
+              <label>Preferred Workout Types</label>
+              <div class="small">Use this like Peloton class preferences.</div>
+              <div class="chip-row" id="typeChoices"></div>
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button class="btn" id="saveProfile">Save Profile + Generate Plan</button>
+            </div>
+          </div>
+          <div class="notice" id="planMeta">No plan generated yet.</div>
+        </article>
+
+        <article class="card col-5">
+          <h2>Generated Weekly Plan</h2>
+          <p>Upper / Lower / Full-Body three-day gym split with progression notes.</p>
+          <div id="planList" class="stack"></div>
+        </article>
+
+        <article class="card col-12">
+          <h2>Workout Library</h2>
+          <p>Search/filter classes by type, level, equipment, and duration.</p>
+          <div class="form-grid">
+            <div>
+              <label for="librarySearch">Search</label>
+              <input id="librarySearch" type="text" placeholder="e.g., upper body, yoga, bike" />
+            </div>
+            <div>
+              <label for="libraryType">Type</label>
+              <select id="libraryType">
+                <option value="all">All</option>
+                <option value="Strength">Strength</option>
+                <option value="HIIT">HIIT</option>
+                <option value="Cardio">Cardio</option>
+                <option value="Yoga">Yoga</option>
+                <option value="Mobility">Mobility</option>
+                <option value="Run">Run</option>
+                <option value="Cycle">Cycle</option>
+                <option value="Row">Row</option>
+                <option value="Meditation">Meditation</option>
+              </select>
+            </div>
+            <div>
+              <label for="libraryLevel">Level</label>
+              <select id="libraryLevel">
+                <option value="all">All</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+            <div>
+              <label for="libraryEquip">Equipment</label>
+              <select id="libraryEquip">
+                <option value="all">All</option>
+                <option value="bodyweight">Bodyweight</option>
+                <option value="dumbbells">Dumbbells</option>
+                <option value="barbell">Barbell</option>
+                <option value="bike">Bike</option>
+                <option value="rower">Rower</option>
+                <option value="treadmill">Treadmill</option>
+                <option value="bands">Bands</option>
+                <option value="kettlebell">Kettlebell</option>
+              </select>
+            </div>
+            <div>
+              <label for="libraryDurationMax">Max Duration (min)</label>
+              <input id="libraryDurationMax" type="number" min="10" max="120" step="5" value="90" />
+            </div>
+          </div>
+          <div class="table-wrap list-scroll" style="margin-top:10px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Workout</th>
+                  <th>Type</th>
+                  <th>Level</th>
+                  <th>Duration</th>
+                  <th>Equipment</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="libraryBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="session" class="panel">
+      <div class="grid">
+        <article class="card col-5">
+          <h2>Live Session</h2>
+          <p>Class-style guided flow with timers, set completion, and performance logging.</p>
+          <div class="form-grid">
+            <div>
+              <label for="sessionWorkout">Select Workout</label>
+              <select id="sessionWorkout"></select>
+            </div>
+            <div>
+              <label for="sessionDate">Date</label>
+              <input id="sessionDate" type="date" />
+            </div>
+            <div>
+              <label for="sessionCalories">Calories</label>
+              <input id="sessionCalories" type="number" min="0" max="3000" step="1" placeholder="e.g. 510" />
+            </div>
+            <div>
+              <label for="sessionMaxHr">Max Heart Rate</label>
+              <input id="sessionMaxHr" type="number" min="0" max="240" step="1" placeholder="e.g. 168" />
+            </div>
+            <div>
+              <label for="sessionRpe">RPE (1-10)</label>
+              <input id="sessionRpe" type="number" min="1" max="10" step="1" placeholder="e.g. 7" />
+            </div>
+            <div>
+              <label for="sessionNotes">Session Notes</label>
+              <input id="sessionNotes" type="text" placeholder="Form cues, PR, pain notes" />
+            </div>
+          </div>
+
+          <div class="chip-row" style="margin-top:8px;">
+            <button class="btn" id="startSession">Start</button>
+            <button class="btn secondary" id="pauseSession">Pause</button>
+            <button class="btn secondary" id="resetSession">Reset</button>
+            <button class="btn warn" id="saveSession">Save Completed Workout</button>
+          </div>
+
+          <div style="margin-top:10px;" class="stack">
+            <div>
+              <div class="small">Session Clock</div>
+              <div class="session-clock" id="sessionClock">00:00</div>
+            </div>
+            <div>
+              <label for="restPreset">Rest Timer Preset</label>
+              <div class="dual">
+                <select id="restPreset">
+                  <option value="30">30 sec</option>
+                  <option value="60" selected>60 sec</option>
+                  <option value="90">90 sec</option>
+                  <option value="120">120 sec</option>
+                </select>
+                <button class="btn secondary" id="toggleRest">Start Rest</button>
+              </div>
+              <div class="chip-row"><span class="chip" id="restClock">Rest: 01:00</span></div>
+            </div>
+          </div>
+          <div class="notice" id="sessionStatus">Pick a workout and press Start.</div>
+        </article>
+
+        <article class="card col-7">
+          <h2>Exercise Flow</h2>
+          <p>Set-by-set completion modeled after guided fitness apps.</p>
+          <div id="sessionWorkoutMeta" class="small">No workout selected.</div>
+          <div id="exerciseList" class="stack list-scroll" style="margin-top:8px;"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="nutrition" class="panel">
+      <div class="grid">
+        <article class="card col-6">
+          <h2>Macro Targets</h2>
+          <p>Goal-based macros by gram, calorie guidance, and meal timing support.</p>
+          <div id="macroTargets" class="chip-row"></div>
+          <div class="notice" id="macroHint">Save your profile first to generate personalized macro targets.</div>
+
+          <h3 style="margin-top:12px;">Daily Log</h3>
+          <div class="form-grid">
+            <div>
+              <label for="foodDate">Date</label>
+              <input id="foodDate" type="date" />
+            </div>
+            <div>
+              <label for="foodCalories">Calories</label>
+              <input id="foodCalories" type="number" min="0" max="8000" step="1" />
+            </div>
+            <div>
+              <label for="foodProtein">Protein (g)</label>
+              <input id="foodProtein" type="number" min="0" max="500" step="1" />
+            </div>
+            <div>
+              <label for="foodCarbs">Carbs (g)</label>
+              <input id="foodCarbs" type="number" min="0" max="900" step="1" />
+            </div>
+            <div>
+              <label for="foodFat">Fat (g)</label>
+              <input id="foodFat" type="number" min="0" max="300" step="1" />
+            </div>
+            <div>
+              <label for="foodWater">Water (L)</label>
+              <input id="foodWater" type="number" min="0" max="10" step="0.1" />
+            </div>
+            <div>
+              <label for="foodFasting">Fasting (hours)</label>
+              <input id="foodFasting" type="number" min="0" max="24" step="0.1" />
+            </div>
+            <div>
+              <label for="foodVoice">Voice Note (text)</label>
+              <input id="foodVoice" type="text" placeholder="Simulated voice logging note" />
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button class="btn" id="saveFoodLog">Save Nutrition Entry</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card col-6">
+          <h2>Quick Food Add + Barcode Lookup</h2>
+          <p>Premium-style quick add macros, barcode logging, and multi-day copy.</p>
+          <div class="form-grid">
+            <div>
+              <label for="barcodeInput">Barcode</label>
+              <input id="barcodeInput" type="text" placeholder="e.g. 012345678905" />
+            </div>
+            <div>
+              <label for="foodNameQuick">Food</label>
+              <input id="foodNameQuick" type="text" placeholder="Greek Yogurt" />
+            </div>
+            <div>
+              <label for="quickCalories">Calories</label>
+              <input id="quickCalories" type="number" min="0" max="2000" step="1" />
+            </div>
+            <div>
+              <label for="quickProtein">Protein</label>
+              <input id="quickProtein" type="number" min="0" max="200" step="1" />
+            </div>
+            <div>
+              <label for="quickCarbs">Carbs</label>
+              <input id="quickCarbs" type="number" min="0" max="300" step="1" />
+            </div>
+            <div>
+              <label for="quickFat">Fat</label>
+              <input id="quickFat" type="number" min="0" max="200" step="1" />
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button class="btn secondary" id="applyQuickAdd">Apply To Daily Log</button>
+            </div>
+          </div>
+
+          <h3 style="margin-top:12px;">Multi-Day Logging</h3>
+          <div class="form-grid">
+            <div>
+              <label for="multiStart">Start Date</label>
+              <input id="multiStart" type="date" />
+            </div>
+            <div>
+              <label for="multiEnd">End Date</label>
+              <input id="multiEnd" type="date" />
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button class="btn secondary" id="copyMultiDay">Copy Current Nutrition To Date Range</button>
+            </div>
+          </div>
+          <div class="notice" id="nutritionStatus">No barcode match yet. Enter manually or use one of the built-in sample barcodes.</div>
+          <div class="chip-row">
+            <span class="chip">Sample barcode: 012345678905</span>
+            <span class="chip">Sample barcode: 49000036756</span>
+          </div>
+        </article>
+
+        <article class="card col-12">
+          <h2>Nutrition History</h2>
+          <div class="table-wrap list-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Calories</th>
+                  <th>Protein</th>
+                  <th>Carbs</th>
+                  <th>Fat</th>
+                  <th>Water</th>
+                  <th>Fasting</th>
+                  <th>Voice Note</th>
+                </tr>
+              </thead>
+              <tbody id="nutritionBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="progress" class="panel">
+      <div class="grid">
+        <article class="card col-4">
+          <h2>Streak + PRs</h2>
+          <div id="progressBadges" class="chip-row"></div>
+          <p class="small">Best efforts and trends update every saved session.</p>
+        </article>
+
+        <article class="card col-4">
+          <h2>Session Trend (last 8 weeks)</h2>
+          <svg id="chartSessions" class="chart" viewBox="0 0 360 132" preserveAspectRatio="none"></svg>
+        </article>
+
+        <article class="card col-4">
+          <h2>Calories Trend (last 14 workouts)</h2>
+          <svg id="chartCalories" class="chart" viewBox="0 0 360 132" preserveAspectRatio="none"></svg>
+        </article>
+
+        <article class="card col-6">
+          <h2>Recovery Trend</h2>
+          <svg id="chartRecovery" class="chart" viewBox="0 0 360 132" preserveAspectRatio="none"></svg>
+        </article>
+
+        <article class="card col-6">
+          <h2>Workout History</h2>
+          <div class="table-wrap list-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Workout</th>
+                  <th>Duration</th>
+                  <th>Calories</th>
+                  <th>RPE</th>
+                  <th>Sets</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody id="workoutHistoryBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+
+      <div class="tab-footer">
+        <button class="btn secondary" id="exportJson">Export Full Data (JSON)</button>
+        <button class="btn secondary" id="exportCsv">Export Workouts CSV</button>
+        <button class="btn secondary" id="importJsonBtn">Import Data (JSON)</button>
+        <input id="importJsonInput" class="hidden" type="file" accept="application/json" />
+      </div>
+    </section>
+
+    <section id="community" class="panel">
+      <div class="grid">
+        <article class="card col-5">
+          <h2>Team Feed</h2>
+          <p>Share milestones and keep momentum with community-style updates.</p>
+          <div class="stack">
+            <div>
+              <label for="postText">Post an update</label>
+              <textarea id="postText" placeholder="e.g., Hit my best split squat today, pain stayed below 3/10."></textarea>
+            </div>
+            <div class="dual">
+              <button class="btn" id="publishPost">Publish</button>
+              <button class="btn secondary" id="seedPosts">Reload Sample Team Posts</button>
+            </div>
+          </div>
+          <div class="notice">Community is local to this device by default. Connect to a backend to make it multi-user.</div>
+        </article>
+
+        <article class="card col-7">
+          <h2>Community Timeline</h2>
+          <div id="postList" class="stack list-scroll"></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <nav class="mobile-nav" role="tablist" aria-label="Mobile tabs">
+    <button class="tab-btn active" data-tab="dashboard">Dash</button>
+    <button class="tab-btn" data-tab="planner">Plan</button>
+    <button class="tab-btn" data-tab="session">Session</button>
+    <button class="tab-btn" data-tab="nutrition">Food</button>
+    <button class="tab-btn" data-tab="progress">Stats</button>
+    <button class="tab-btn" data-tab="community">Team</button>
+  </nav>
+
+  <script>
+    const STORAGE_KEY = "pulseforge_state_v1";
+    const ACTIVE_TAB_KEY = "pulseforge_active_tab_v1";
+
+    const EQUIPMENT_OPTIONS = ["bodyweight", "dumbbells", "barbell", "kettlebell", "bands", "bench", "bike", "rower", "treadmill"];
+    const TYPE_OPTIONS = ["Strength", "HIIT", "Cardio", "Yoga", "Mobility", "Run", "Cycle", "Row", "Meditation"];
+
+    const WORKOUT_LIBRARY = [
+      {
+        id: "strength_upper_1",
+        name: "Upper Strength Builder",
+        type: "Strength",
+        level: "intermediate",
+        duration: 45,
+        equipment: ["dumbbells", "bench"],
+        goals: ["muscle", "recomp"],
+        calories: 420,
+        exercises: [
+          { name: "Incline Dumbbell Press", sets: 4, target: "8-10 reps" },
+          { name: "One-Arm Dumbbell Row", sets: 4, target: "10 reps / side" },
+          { name: "Seated Shoulder Press", sets: 3, target: "8-10 reps" },
+          { name: "Lateral Raise", sets: 3, target: "12-15 reps" },
+          { name: "Superset: Curl + Pressdown", sets: 3, target: "12 reps each" }
+        ]
+      },
+      {
+        id: "strength_lower_1",
+        name: "Lower Strength and Stability",
+        type: "Strength",
+        level: "intermediate",
+        duration: 48,
+        equipment: ["dumbbells", "kettlebell"],
+        goals: ["muscle", "fat_loss", "recomp"],
+        calories: 460,
+        exercises: [
+          { name: "Goblet Squat", sets: 4, target: "10 reps" },
+          { name: "Romanian Deadlift", sets: 4, target: "8 reps" },
+          { name: "Split Squat", sets: 3, target: "10 reps / side" },
+          { name: "Hamstring Bridge", sets: 3, target: "12 reps" },
+          { name: "Plank", sets: 3, target: "45 sec" }
+        ]
+      },
+      {
+        id: "full_body_db",
+        name: "Full-Body Dumbbell Circuit",
+        type: "HIIT",
+        level: "beginner",
+        duration: 32,
+        equipment: ["dumbbells"],
+        goals: ["fat_loss", "recomp", "endurance"],
+        calories: 380,
+        exercises: [
+          { name: "DB Thruster", sets: 4, target: "40 sec on / 20 sec off" },
+          { name: "Renegade Row", sets: 4, target: "40 sec on / 20 sec off" },
+          { name: "DB Reverse Lunge", sets: 4, target: "40 sec on / 20 sec off" },
+          { name: "Mountain Climbers", sets: 4, target: "40 sec on / 20 sec off" }
+        ]
+      },
+      {
+        id: "bodyweight_hiit",
+        name: "Bodyweight Conditioning Blast",
+        type: "HIIT",
+        level: "beginner",
+        duration: 25,
+        equipment: ["bodyweight"],
+        goals: ["fat_loss", "endurance"],
+        calories: 300,
+        exercises: [
+          { name: "Air Squats", sets: 4, target: "45 sec" },
+          { name: "Push-Ups", sets: 4, target: "40 sec" },
+          { name: "High Knees", sets: 4, target: "45 sec" },
+          { name: "Dead Bug", sets: 4, target: "40 sec" }
+        ]
+      },
+      {
+        id: "treadmill_intervals",
+        name: "Treadmill Intervals 5-90",
+        type: "Run",
+        level: "intermediate",
+        duration: 35,
+        equipment: ["treadmill"],
+        goals: ["endurance", "fat_loss"],
+        calories: 430,
+        exercises: [
+          { name: "Warm-Up Walk", sets: 1, target: "5 min" },
+          { name: "Run Intervals", sets: 8, target: "90 sec run / 60 sec easy" },
+          { name: "Incline Walk", sets: 1, target: "6 min" },
+          { name: "Cooldown", sets: 1, target: "5 min" }
+        ]
+      },
+      {
+        id: "bike_power",
+        name: "Power Bike Ride",
+        type: "Cycle",
+        level: "intermediate",
+        duration: 40,
+        equipment: ["bike"],
+        goals: ["endurance", "fat_loss"],
+        calories: 500,
+        exercises: [
+          { name: "Easy Spin", sets: 1, target: "6 min" },
+          { name: "Power Block", sets: 5, target: "4 min hard / 2 min easy" },
+          { name: "Cadence Finish", sets: 1, target: "5 min" },
+          { name: "Cooldown", sets: 1, target: "5 min" }
+        ]
+      },
+      {
+        id: "row_engine",
+        name: "Rowing Engine Builder",
+        type: "Row",
+        level: "advanced",
+        duration: 34,
+        equipment: ["rower"],
+        goals: ["endurance", "recomp"],
+        calories: 460,
+        exercises: [
+          { name: "Technique Warm-Up", sets: 1, target: "5 min" },
+          { name: "2k Pace Repeats", sets: 6, target: "2 min on / 1 min off" },
+          { name: "Steady Row", sets: 1, target: "8 min" }
+        ]
+      },
+      {
+        id: "yoga_flow",
+        name: "Yoga Flow Reset",
+        type: "Yoga",
+        level: "beginner",
+        duration: 30,
+        equipment: ["bodyweight"],
+        goals: ["mobility", "recomp", "fat_loss"],
+        calories: 170,
+        exercises: [
+          { name: "Breath + Mobility Prep", sets: 1, target: "5 min" },
+          { name: "Standing Flow", sets: 3, target: "4 min" },
+          { name: "Hip Opener Series", sets: 2, target: "4 min" },
+          { name: "Cooldown Breathwork", sets: 1, target: "5 min" }
+        ]
+      },
+      {
+        id: "mobility_repair",
+        name: "Mobility and Tissue Care",
+        type: "Mobility",
+        level: "beginner",
+        duration: 24,
+        equipment: ["bands", "bodyweight"],
+        goals: ["mobility", "recomp"],
+        calories: 120,
+        exercises: [
+          { name: "Thoracic Rotations", sets: 2, target: "8 reps / side" },
+          { name: "Band Hip CARs", sets: 2, target: "8 reps / side" },
+          { name: "Ankle Mobility", sets: 2, target: "10 reps / side" },
+          { name: "Glute Activation", sets: 3, target: "12 reps" },
+          { name: "Breathing Reset", sets: 1, target: "4 min" }
+        ]
+      },
+      {
+        id: "core_strength",
+        name: "Core and Posture Strength",
+        type: "Strength",
+        level: "beginner",
+        duration: 28,
+        equipment: ["bodyweight", "bands"],
+        goals: ["recomp", "mobility", "fat_loss"],
+        calories: 230,
+        exercises: [
+          { name: "Dead Bug", sets: 3, target: "10 reps / side" },
+          { name: "Pallof Press", sets: 3, target: "12 reps / side" },
+          { name: "Side Plank", sets: 3, target: "30 sec / side" },
+          { name: "Bird Dog", sets: 3, target: "10 reps / side" }
+        ]
+      },
+      {
+        id: "tempo_run_outdoor",
+        name: "Outdoor Tempo Run",
+        type: "Run",
+        level: "advanced",
+        duration: 42,
+        equipment: ["bodyweight"],
+        goals: ["endurance", "fat_loss"],
+        calories: 520,
+        exercises: [
+          { name: "Easy Jog", sets: 1, target: "10 min" },
+          { name: "Tempo Block", sets: 3, target: "8 min on / 2 min easy" },
+          { name: "Cooldown", sets: 1, target: "6 min" }
+        ]
+      },
+      {
+        id: "mindful_recovery",
+        name: "Mindful Recovery Session",
+        type: "Meditation",
+        level: "beginner",
+        duration: 20,
+        equipment: ["bodyweight"],
+        goals: ["mobility", "recomp", "fat_loss"],
+        calories: 90,
+        exercises: [
+          { name: "Box Breathing", sets: 1, target: "5 min" },
+          { name: "Body Scan", sets: 1, target: "8 min" },
+          { name: "Visualization", sets: 1, target: "7 min" }
+        ]
+      },
+      {
+        id: "barbell_power",
+        name: "Barbell Power Day",
+        type: "Strength",
+        level: "advanced",
+        duration: 55,
+        equipment: ["barbell", "bench"],
+        goals: ["muscle", "recomp"],
+        calories: 560,
+        exercises: [
+          { name: "Back Squat", sets: 5, target: "5 reps" },
+          { name: "Bench Press", sets: 5, target: "5 reps" },
+          { name: "Deadlift", sets: 4, target: "4 reps" },
+          { name: "Barbell Row", sets: 4, target: "8 reps" },
+          { name: "Loaded Carry", sets: 4, target: "30 m" }
+        ]
+      },
+      {
+        id: "hybrid_conditioning",
+        name: "Hybrid Conditioning Lab",
+        type: "Cardio",
+        level: "intermediate",
+        duration: 38,
+        equipment: ["rower", "dumbbells", "bodyweight"],
+        goals: ["fat_loss", "endurance", "recomp"],
+        calories: 480,
+        exercises: [
+          { name: "Row Sprint", sets: 6, target: "45 sec" },
+          { name: "DB Front Squat", sets: 6, target: "10 reps" },
+          { name: "Burpee Step-Down", sets: 6, target: "8 reps" },
+          { name: "Walk Recovery", sets: 6, target: "45 sec" }
+        ]
+      }
+    ];
+
+    const FIXED_GYM_DAYS_PER_WEEK = 3;
+    const FIXED_GYM_WEEKLY_TARGET = 3;
+    const THREE_DAY_GYM_SLOTS = [0, 2, 4]; // Mon, Wed, Fri
+
+    const CHALLENGE_TEMPLATES = [
+      { id: "challenge_sessions", title: "Complete weekly sessions", metric: "sessions", target: FIXED_GYM_WEEKLY_TARGET, unit: "sessions" },
+      { id: "challenge_hydration", title: "Hydration consistency", metric: "hydration", target: 5, unit: "days" },
+      { id: "challenge_streak", title: "Keep a 7-day activity streak", metric: "streak", target: 7, unit: "days" }
+    ];
+
+    const FOOD_DB = {
+      "012345678905": { name: "Greek Yogurt Cup", calories: 140, protein: 13, carbs: 11, fat: 4 },
+      "49000036756": { name: "Banana Oat Bar", calories: 180, protein: 5, carbs: 29, fat: 6 },
+      "8801062015129": { name: "Protein Milk", calories: 190, protein: 24, carbs: 14, fat: 4 }
+    };
+
+    const STARTER_POSTS = [
+      { id: "seed-1", user: "Coach Lina", text: "Week target reset. Post one form win and one recovery win today.", ts: "2026-04-27T09:20:00.000Z" },
+      { id: "seed-2", user: "Team CoreLab", text: "Challenge reminder: 3 gym sessions this week unlocks your consistency badge.", ts: "2026-04-28T13:10:00.000Z" },
+      { id: "seed-3", user: "Jordan K.", text: "Hit a new split-squat PR. Holding tempo helped my glute feel stable.", ts: "2026-04-29T06:40:00.000Z" }
+    ];
+
+    const state = loadState();
+    let sessionTimer = null;
+    let restTimer = null;
+
+    function defaultState() {
+      return {
+        profile: {
+          name: "",
+          age: "",
+          weightKg: "",
+          heightCm: "",
+          goal: "recomp",
+          experience: "intermediate",
+          daysPerWeek: FIXED_GYM_DAYS_PER_WEEK,
+          preferredDuration: 45,
+          weeklyTarget: FIXED_GYM_WEEKLY_TARGET,
+          reminderHour: "18:30",
+          equipment: ["bodyweight", "dumbbells", "bench"],
+          preferredTypes: ["Strength", "HIIT", "Mobility"]
+        },
+        plan: {
+          generatedAt: null,
+          weekStart: null,
+          sessions: []
+        },
+        session: {
+          workoutId: "",
+          date: "",
+          elapsedSec: 0,
+          running: false,
+          setsDone: {}
+        },
+        logs: {
+          workouts: [],
+          nutrition: [],
+          recovery: []
+        },
+        challenges: CHALLENGE_TEMPLATES.map(item => ({ ...item })),
+        posts: [...STARTER_POSTS]
+      };
+    }
+
+    function loadState() {
+      const base = defaultState();
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return base;
+      try {
+        const parsed = JSON.parse(raw);
+        return {
+          ...base,
+          ...parsed,
+          profile: { ...base.profile, ...(parsed.profile || {}) },
+          plan: { ...base.plan, ...(parsed.plan || {}) },
+          session: { ...base.session, ...(parsed.session || {}) },
+          logs: {
+            ...base.logs,
+            ...(parsed.logs || {}),
+            workouts: Array.isArray(parsed?.logs?.workouts) ? parsed.logs.workouts : [],
+            nutrition: Array.isArray(parsed?.logs?.nutrition) ? parsed.logs.nutrition : [],
+            recovery: Array.isArray(parsed?.logs?.recovery) ? parsed.logs.recovery : []
+          },
+          challenges: Array.isArray(parsed.challenges) && parsed.challenges.length
+            ? parsed.challenges.map(c => ({ ...c }))
+            : base.challenges,
+          posts: Array.isArray(parsed.posts) && parsed.posts.length ? parsed.posts : [...STARTER_POSTS]
+        };
+      } catch (error) {
+        console.error("Could not parse saved state", error);
+        return base;
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    function todayISO() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function parseISODate(v) {
+      const d = new Date(`${v}T00:00:00`);
+      return Number.isFinite(d.getTime()) ? d : null;
+    }
+
+    function startOfWeekMonday(dateInput = new Date()) {
+      const d = new Date(dateInput);
+      const day = d.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      d.setDate(d.getDate() + diff);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
+
+    function toISODate(d) {
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function fmtShortDate(iso) {
+      if (!iso) return "-";
+      const d = parseISODate(iso);
+      if (!d) return iso;
+      return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    }
+
+    function clamp(n, min, max) {
+      return Math.min(max, Math.max(min, n));
+    }
+
+    function uniqueId(prefix = "id") {
+      return `${prefix}_${Math.random().toString(36).slice(2, 8)}_${Date.now().toString(36).slice(-4)}`;
+    }
+
+    function formatClock(totalSec) {
+      const sec = Math.max(0, Math.floor(totalSec));
+      const mm = String(Math.floor(sec / 60)).padStart(2, "0");
+      const ss = String(sec % 60).padStart(2, "0");
+      return `${mm}:${ss}`;
+    }
+
+    function normalizeText(v) {
+      return String(v || "").trim().toLowerCase();
+    }
+
+    function setActiveTab(tabId) {
+      document.querySelectorAll(".panel").forEach(panel => {
+        panel.classList.toggle("active", panel.id === tabId);
+      });
+      document.querySelectorAll(".tab-btn[data-tab]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tabId);
+      });
+      localStorage.setItem(ACTIVE_TAB_KEY, tabId);
+    }
+
+    function renderEquipmentChoices() {
+      const host = $("equipmentChoices");
+      host.innerHTML = EQUIPMENT_OPTIONS.map(item => {
+        const checked = state.profile.equipment.includes(item) ? "checked" : "";
+        const id = `equip_${item}`;
+        return `<label class="chip" for="${id}"><input id="${id}" type="checkbox" data-equip="${item}" ${checked} style="width:auto; margin-right:6px;" />${item}</label>`;
+      }).join("");
+    }
+
+    function renderTypeChoices() {
+      const host = $("typeChoices");
+      host.innerHTML = TYPE_OPTIONS.map(item => {
+        const checked = state.profile.preferredTypes.includes(item) ? "checked" : "";
+        const id = `type_${item}`;
+        return `<label class="chip" for="${id}"><input id="${id}" type="checkbox" data-type="${item}" ${checked} style="width:auto; margin-right:6px;" />${item}</label>`;
+      }).join("");
+    }
+
+    function loadProfileToForm() {
+      $("profileName").value = state.profile.name || "";
+      $("profileAge").value = state.profile.age || "";
+      $("profileWeight").value = state.profile.weightKg || "";
+      $("profileHeight").value = state.profile.heightCm || "";
+      $("profileGoal").value = state.profile.goal || "recomp";
+      $("profileExperience").value = state.profile.experience || "intermediate";
+      $("profileDays").value = String(FIXED_GYM_DAYS_PER_WEEK);
+      $("profileDuration").value = String(state.profile.preferredDuration || 45);
+      $("profileWeeklyTarget").value = String(FIXED_GYM_WEEKLY_TARGET);
+      $("profileReminderHour").value = state.profile.reminderHour || "18:30";
+      renderEquipmentChoices();
+      renderTypeChoices();
+    }
+
+    function readProfileFromForm() {
+      const equipment = Array.from(document.querySelectorAll("[data-equip]:checked")).map(el => el.dataset.equip);
+      const preferredTypes = Array.from(document.querySelectorAll("[data-type]:checked")).map(el => el.dataset.type);
+
+      state.profile = {
+        ...state.profile,
+        name: $("profileName").value.trim(),
+        age: $("profileAge").value.trim(),
+        weightKg: $("profileWeight").value.trim(),
+        heightCm: $("profileHeight").value.trim(),
+        goal: $("profileGoal").value,
+        experience: $("profileExperience").value,
+        daysPerWeek: FIXED_GYM_DAYS_PER_WEEK,
+        preferredDuration: clamp(Number($("profileDuration").value) || 45, 15, 120),
+        weeklyTarget: FIXED_GYM_WEEKLY_TARGET,
+        reminderHour: $("profileReminderHour").value || "18:30",
+        equipment: equipment.length ? equipment : ["bodyweight"],
+        preferredTypes: preferredTypes.length ? preferredTypes : ["Strength", "Mobility"]
+      };
+      saveState();
+      renderProfileSnapshot();
+      renderMacroTargets();
+    }
+
+    function matchScore(workout, profile) {
+      let score = 0;
+      if (workout.goals.includes(profile.goal)) score += 4;
+      if (profile.preferredTypes.includes(workout.type)) score += 4;
+      if (workout.duration <= profile.preferredDuration + 10) score += 2;
+      if (workout.level === profile.experience) score += 1;
+
+      const matchedEquip = workout.equipment.filter(eq => profile.equipment.includes(eq)).length;
+      const equipRatio = matchedEquip / workout.equipment.length;
+      score += equipRatio * 6;
+
+      if (equipRatio < 0.5) score -= 2;
+      return score;
+    }
+
+    function isGymPlanWorkout(workout) {
+      return ["Strength", "HIIT", "Cardio", "Mobility"].includes(workout.type);
+    }
+
+    function workoutMatchesEquipment(workout, profileEquipment) {
+      const matched = workout.equipment.filter(eq => profileEquipment.includes(eq)).length;
+      return matched / Math.max(workout.equipment.length, 1) >= 0.5;
+    }
+
+    function pickWorkoutForTemplate(candidates, pool, used, profile) {
+      const byCandidate = candidates
+        .map(id => workoutById(id))
+        .filter(Boolean)
+        .sort((a, b) => matchScore(b, profile) - matchScore(a, profile));
+
+      return byCandidate.find(w => !used.has(w.id) && workoutMatchesEquipment(w, profile.equipment))
+        || byCandidate.find(w => !used.has(w.id))
+        || pool.find(w => !used.has(w.id) && workoutMatchesEquipment(w, profile.equipment))
+        || pool.find(w => !used.has(w.id))
+        || null;
+    }
+
+    function generatePlan() {
+      const profile = state.profile;
+      profile.daysPerWeek = FIXED_GYM_DAYS_PER_WEEK;
+      profile.weeklyTarget = FIXED_GYM_WEEKLY_TARGET;
+
+      const weekStart = startOfWeekMonday();
+      const template = [
+        {
+          slot: THREE_DAY_GYM_SLOTS[0],
+          label: "Day 1 - Upper Body",
+          candidates: ["strength_upper_1", "barbell_power", "core_strength"],
+          progression: "Prioritize heavy upper compounds, then add reps before load."
+        },
+        {
+          slot: THREE_DAY_GYM_SLOTS[1],
+          label: "Day 2 - Lower Body",
+          candidates: ["strength_lower_1", "barbell_power", "hybrid_conditioning"],
+          progression: "Progress lower-body load by 2-5% once all target reps are clean."
+        },
+        {
+          slot: THREE_DAY_GYM_SLOTS[2],
+          label: "Day 3 - Full Body",
+          candidates: ["full_body_db", "hybrid_conditioning", "core_strength", "mobility_repair"],
+          progression: "Use full-body day to accumulate quality volume without grinding to failure."
+        }
+      ];
+
+      const pool = WORKOUT_LIBRARY
+        .filter(isGymPlanWorkout)
+        .sort((a, b) => matchScore(b, profile) - matchScore(a, profile));
+      const used = new Set();
+      const sessions = [];
+
+      template.forEach(dayTemplate => {
+        const best = pickWorkoutForTemplate(dayTemplate.candidates, pool, used, profile);
+
+        if (!best) return;
+        used.add(best.id);
+
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + dayTemplate.slot);
+
+        sessions.push({
+          id: uniqueId("plan"),
+          date: toISODate(date),
+          dayLabel: `${dayTemplate.label} (${date.toLocaleDateString(undefined, { weekday: "long" })})`,
+          workoutId: best.id,
+          progression: dayTemplate.progression
+        });
+      });
+
+      state.plan = {
+        generatedAt: new Date().toISOString(),
+        weekStart: toISODate(weekStart),
+        sessions
+      };
+
+      if (!state.session.workoutId && sessions.length) {
+        state.session.workoutId = sessions[0].workoutId;
+      }
+
+      saveState();
+      renderPlan();
+      renderSessionWorkoutOptions();
+      renderDashboard();
+      $("sessionStatus").textContent = "3-day gym plan generated. Open Session and press Start when ready.";
+    }
+
+    function workoutById(id) {
+      return WORKOUT_LIBRARY.find(item => item.id === id) || null;
+    }
+
+    function renderPlan() {
+      const host = $("planList");
+      const meta = $("planMeta");
+      const sessions = state.plan.sessions || [];
+      if (!sessions.length) {
+        host.innerHTML = `<p class="small">No scheduled sessions yet.</p>`;
+        meta.textContent = "No plan generated yet.";
+        return;
+      }
+
+      meta.textContent = `Plan generated ${new Date(state.plan.generatedAt).toLocaleString()} | Week of ${fmtShortDate(state.plan.weekStart)} | 3-day gym split | Reminder ${state.profile.reminderHour}`;
+
+      host.innerHTML = sessions.map(slot => {
+        const w = workoutById(slot.workoutId);
+        if (!w) return "";
+        return `
+          <article class="plan-day">
+            <strong>${slot.dayLabel} (${fmtShortDate(slot.date)})</strong>
+            <div>${w.name} · ${w.type} · ${w.duration} min · ${w.level}</div>
+            <div class="small">${w.equipment.join(", ")} | ${slot.progression}</div>
+            <button class="pill-btn" data-plan-activate="${w.id}">Use in Session</button>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderProfileSnapshot() {
+      const p = state.profile;
+      const text = p.name
+        ? `${p.name} · Goal: ${p.goal.replaceAll("_", " ")} · ${p.experience} · Fixed 3-day gym split · ${p.preferredDuration} min sessions · Equip: ${p.equipment.join(", ")}`
+        : "Set up your profile in Planner to unlock personalized AI-style programming.";
+      $("profileSnapshot").textContent = text;
+    }
+
+    function currentWeekSessionStats() {
+      const weekStart = startOfWeekMonday();
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+
+      const logs = state.logs.workouts.filter(item => {
+        const d = parseISODate(item.date);
+        return d && d >= weekStart && d <= weekEnd;
+      });
+
+      const target = Math.max(state.profile.weeklyTarget || state.profile.daysPerWeek || FIXED_GYM_WEEKLY_TARGET, 1);
+      return { done: logs.length, target };
+    }
+
+    function calculateStreak() {
+      const dates = [...new Set(state.logs.workouts.map(w => w.date))]
+        .map(parseISODate)
+        .filter(Boolean)
+        .sort((a, b) => b - a);
+
+      if (!dates.length) return 0;
+
+      let streak = 0;
+      let cursor = startOfDay(new Date());
+
+      const set = new Set(dates.map(d => toISODate(d)));
+      if (!set.has(toISODate(cursor))) {
+        cursor.setDate(cursor.getDate() - 1);
+      }
+
+      while (set.has(toISODate(cursor))) {
+        streak += 1;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+
+      return streak;
+    }
+
+    function startOfDay(d) {
+      const n = new Date(d);
+      n.setHours(0, 0, 0, 0);
+      return n;
+    }
+
+    function latestRecoveryEntry() {
+      return [...state.logs.recovery].sort((a, b) => (a.date < b.date ? 1 : -1))[0] || null;
+    }
+
+    function calculateRecoveryReadiness(entry) {
+      if (!entry) return null;
+      const sleep = Number(entry.sleepHours) || 0;
+      const soreness = Number(entry.soreness) || 0;
+      const stress = Number(entry.stress) || 0;
+
+      let score = 50;
+      score += clamp((sleep - 6) * 8, -20, 24);
+      score += clamp((6 - soreness) * 5, -20, 20);
+      score += clamp((6 - stress) * 4, -16, 16);
+      score = clamp(Math.round(score), 0, 100);
+
+      let zone = "Low";
+      if (score >= 75) zone = "High";
+      else if (score >= 55) zone = "Medium";
+
+      return { score, zone };
+    }
+
+    function calculatePersonalBest() {
+      if (!state.logs.workouts.length) return null;
+      const sorted = [...state.logs.workouts];
+      const maxCalories = sorted.reduce((acc, row) => row.calories > acc.calories ? row : acc, sorted[0]);
+      const maxDuration = sorted.reduce((acc, row) => row.durationMin > acc.durationMin ? row : acc, sorted[0]);
+      return {
+        calories: `${maxCalories.calories} kcal (${fmtShortDate(maxCalories.date)})`,
+        duration: `${maxDuration.durationMin} min (${fmtShortDate(maxDuration.date)})`
+      };
+    }
+
+    function hydrationStatsThisWeek() {
+      const weekStart = startOfWeekMonday();
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+
+      const entries = state.logs.nutrition.filter(item => {
+        const d = parseISODate(item.date);
+        return d && d >= weekStart && d <= weekEnd;
+      });
+
+      const hit = entries.filter(item => Number(item.water) >= 2).length;
+      return { hit, total: 7 };
+    }
+
+    function challengeProgress() {
+      const sessionStat = currentWeekSessionStats();
+      const hydration = hydrationStatsThisWeek();
+      const streak = calculateStreak();
+
+      return state.challenges.map(ch => {
+        let value = 0;
+        if (ch.metric === "sessions") value = sessionStat.done;
+        else if (ch.metric === "hydration") value = hydration.hit;
+        else if (ch.metric === "streak") value = streak;
+
+        return {
+          ...ch,
+          value,
+          pct: clamp(Math.round((value / Math.max(ch.target, 1)) * 100), 0, 100)
+        };
+      });
+    }
+
+    function renderChallengeList() {
+      const host = $("challengeList");
+      const items = challengeProgress();
+      host.innerHTML = items.map(ch => `
+        <div>
+          <div class="dual">
+            <strong>${ch.title}</strong>
+            <span class="small">${ch.value}/${ch.target} ${ch.unit}</span>
+          </div>
+          <div class="meter"><span style="width:${ch.pct}%"></span></div>
+        </div>
+      `).join("");
+    }
+
+    function renderDashboard() {
+      const week = currentWeekSessionStats();
+      const streak = calculateStreak();
+      const readiness = calculateRecoveryReadiness(latestRecoveryEntry());
+      const pr = calculatePersonalBest();
+      const hydration = hydrationStatsThisWeek();
+      const challenges = challengeProgress();
+
+      $("kpiStreak").textContent = `${streak} day${streak === 1 ? "" : "s"}`;
+      $("kpiWeek").textContent = `${week.done} / ${week.target} sessions`;
+      $("kpiReadiness").textContent = readiness ? `${readiness.zone} (${readiness.score})` : "No check-in";
+      $("kpiBest").textContent = pr ? `Dur ${pr.duration.split(" (")[0]} · Cal ${pr.calories.split(" (")[0]}` : "-";
+
+      const weekPct = clamp(Math.round((week.done / Math.max(week.target, 1)) * 100), 0, 100);
+      const hydrationPct = clamp(Math.round((hydration.hit / hydration.total) * 100), 0, 100);
+      const challengePct = challenges.length ? Math.round(challenges.reduce((acc, c) => acc + c.pct, 0) / challenges.length) : 0;
+
+      $("dashSessionBar").style.width = `${weekPct}%`;
+      $("dashSessionText").textContent = `${weekPct}%`;
+      $("dashSessionMeta").textContent = `${week.done} of ${week.target} sessions`;
+
+      $("dashHydrationBar").style.width = `${hydrationPct}%`;
+      $("dashHydrationText").textContent = `${hydrationPct}%`;
+      $("dashHydrationMeta").textContent = `${hydration.hit} days at >= 2L`;
+
+      $("dashChallengeBar").style.width = `${challengePct}%`;
+      $("dashChallengeText").textContent = `${challengePct}%`;
+      $("dashChallengeMeta").textContent = challenges.length ? `${challenges.filter(c => c.pct >= 100).length} completed` : "No active challenge";
+
+      const latestWorkout = [...state.logs.workouts].sort((a, b) => (a.date < b.date ? 1 : -1))[0];
+      const highlights = [];
+      if (latestWorkout) highlights.push(`Latest: ${latestWorkout.workoutName} on ${fmtShortDate(latestWorkout.date)}`);
+      if (readiness) highlights.push(`Readiness ${readiness.score}: ${readiness.zone}`);
+      if (state.plan.sessions.length) highlights.push(`Plan ready: ${state.plan.sessions.length} sessions`);
+      if (!highlights.length) highlights.push("Add your first profile and workout to unlock insights.");
+
+      $("dashHighlights").innerHTML = highlights.map(item => `<span class="chip">${item}</span>`).join("");
+      renderChallengeList();
+      renderRecoveryBadge(readiness);
+    }
+
+    function renderRecoveryBadge(readiness) {
+      const host = $("recoveryBadge");
+      const entry = latestRecoveryEntry();
+      if (!entry || !readiness) {
+        host.innerHTML = `<span class="chip">No recovery check-in logged yet.</span>`;
+        return;
+      }
+
+      host.innerHTML = `
+        <span class="chip">${entry.date}</span>
+        <span class="chip">Sleep ${entry.sleepHours}h</span>
+        <span class="chip">Soreness ${entry.soreness}/10</span>
+        <span class="chip">Stress ${entry.stress}/10</span>
+        <span class="chip">Readiness ${readiness.zone} (${readiness.score})</span>
+      `;
+    }
+
+    function saveRecovery() {
+      const date = $("recoveryDate").value;
+      const sleepHours = Number($("sleepHours").value);
+      const soreness = Number($("sorenessScore").value);
+      const stress = Number($("stressScore").value);
+      const note = $("recoveryNote").value.trim();
+
+      if (!date) {
+        alert("Choose a date for recovery check-in.");
+        return;
+      }
+      if (!Number.isFinite(sleepHours) || sleepHours <= 0) {
+        alert("Enter valid sleep hours.");
+        return;
+      }
+      if (!Number.isFinite(soreness) || soreness < 1 || soreness > 10) {
+        alert("Soreness must be 1-10.");
+        return;
+      }
+      if (!Number.isFinite(stress) || stress < 1 || stress > 10) {
+        alert("Stress must be 1-10.");
+        return;
+      }
+
+      const entry = { id: uniqueId("rec"), date, sleepHours, soreness, stress, note };
+      const idx = state.logs.recovery.findIndex(item => item.date === date);
+      if (idx >= 0) state.logs.recovery[idx] = entry;
+      else state.logs.recovery.push(entry);
+
+      saveState();
+      renderDashboard();
+      renderProgress();
+    }
+
+    function renderLibrary() {
+      const body = $("libraryBody");
+      const q = normalizeText($("librarySearch").value);
+      const type = $("libraryType").value;
+      const level = $("libraryLevel").value;
+      const equip = $("libraryEquip").value;
+      const maxDuration = Number($("libraryDurationMax").value) || 999;
+
+      const rows = WORKOUT_LIBRARY.filter(item => {
+        const matchesQ = !q || `${item.name} ${item.type} ${item.equipment.join(" ")}`.toLowerCase().includes(q);
+        const matchesType = type === "all" || item.type === type;
+        const matchesLevel = level === "all" || item.level === level;
+        const matchesEquip = equip === "all" || item.equipment.includes(equip);
+        const matchesDuration = item.duration <= maxDuration;
+        return matchesQ && matchesType && matchesLevel && matchesEquip && matchesDuration;
+      });
+
+      body.innerHTML = rows.map(item => `
+        <tr>
+          <td>
+            <strong>${item.name}</strong>
+            <div class="small">${item.exercises.length} moves · ${item.calories} kcal est.</div>
+          </td>
+          <td>${item.type}</td>
+          <td>${item.level}</td>
+          <td>${item.duration} min</td>
+          <td>${item.equipment.join(", ")}</td>
+          <td><button class="pill-btn" data-quick-plan="${item.id}">Add to Plan</button></td>
+        </tr>
+      `).join("");
+
+      if (!rows.length) {
+        body.innerHTML = `<tr><td colspan="6">No workouts match this filter.</td></tr>`;
+      }
+    }
+
+    function addWorkoutToPlan(workoutId) {
+      const workout = workoutById(workoutId);
+      if (!workout) return;
+      const weekStart = state.plan.weekStart ? parseISODate(state.plan.weekStart) : startOfWeekMonday();
+      const fallbackDay = (state.plan.sessions.length % 7);
+      const date = new Date(weekStart);
+      date.setDate(weekStart.getDate() + fallbackDay);
+
+      state.plan.sessions.push({
+        id: uniqueId("plan"),
+        date: toISODate(date),
+        dayLabel: date.toLocaleDateString(undefined, { weekday: "long" }),
+        workoutId,
+        progression: "Added manually from library"
+      });
+      state.plan.generatedAt = new Date().toISOString();
+      state.plan.weekStart = state.plan.weekStart || toISODate(weekStart);
+      saveState();
+      renderPlan();
+      renderSessionWorkoutOptions();
+      renderDashboard();
+    }
+
+    function renderSessionWorkoutOptions() {
+      const select = $("sessionWorkout");
+      const base = state.plan.sessions.map(slot => slot.workoutId);
+      const unique = [...new Set([...base, ...WORKOUT_LIBRARY.map(w => w.id)])];
+
+      select.innerHTML = unique.map(id => {
+        const w = workoutById(id);
+        if (!w) return "";
+        return `<option value="${id}">${w.name} (${w.type}, ${w.duration}m)</option>`;
+      }).join("");
+
+      if (state.session.workoutId && unique.includes(state.session.workoutId)) {
+        select.value = state.session.workoutId;
+      } else if (unique.length) {
+        state.session.workoutId = unique[0];
+        select.value = unique[0];
+      }
+
+      if (!state.session.date) {
+        state.session.date = todayISO();
+      }
+      $("sessionDate").value = state.session.date;
+      renderSessionWorkout();
+    }
+
+    function setDefaultsForSessionMetrics(workout) {
+      if (!workout) return;
+      if (!$("sessionCalories").value) $("sessionCalories").value = String(workout.calories || 0);
+    }
+
+    function sessionSetKey(exerciseIndex, setIndex) {
+      return `${exerciseIndex}-${setIndex}`;
+    }
+
+    function renderSessionWorkout() {
+      const workout = workoutById(state.session.workoutId);
+      const host = $("exerciseList");
+      const meta = $("sessionWorkoutMeta");
+      if (!workout) {
+        host.innerHTML = `<p class="small">No workout selected.</p>`;
+        meta.textContent = "No workout selected.";
+        return;
+      }
+
+      meta.textContent = `${workout.name} · ${workout.type} · ${workout.level} · ${workout.duration} min · Equip: ${workout.equipment.join(", ")}`;
+      setDefaultsForSessionMetrics(workout);
+
+      host.innerHTML = workout.exercises.map((ex, exIndex) => {
+        const sets = Array.from({ length: ex.sets }, (_, setIdx) => {
+          const key = sessionSetKey(exIndex, setIdx);
+          const done = state.session.setsDone[key] ? "done" : "";
+          const label = state.session.setsDone[key] ? "Done" : "Pending";
+          return `<button class="set-tag ${done}" data-set-toggle="${key}"><span>Set ${setIdx + 1}</span><span>${label}</span></button>`;
+        }).join("");
+
+        return `
+          <article class="exercise-item">
+            <strong>${exIndex + 1}. ${ex.name}</strong>
+            <div class="small">Target: ${ex.target} · ${ex.sets} sets</div>
+            <div class="set-grid">${sets}</div>
+          </article>
+        `;
+      }).join("");
+
+      updateSessionStatusSummary();
+    }
+
+    function totalAndDoneSets() {
+      const workout = workoutById(state.session.workoutId);
+      if (!workout) return { total: 0, done: 0 };
+      const total = workout.exercises.reduce((acc, ex) => acc + ex.sets, 0);
+      const done = Object.values(state.session.setsDone).filter(Boolean).length;
+      return { total, done };
+    }
+
+    function updateSessionStatusSummary() {
+      const workout = workoutById(state.session.workoutId);
+      const { total, done } = totalAndDoneSets();
+      const donePct = total ? Math.round((done / total) * 100) : 0;
+      const status = state.session.running ? "Running" : "Paused";
+      if (!workout) {
+        $("sessionStatus").textContent = "Pick a workout and press Start.";
+        return;
+      }
+      $("sessionStatus").textContent = `${status} · ${workout.name} · Set completion ${done}/${total} (${donePct}%)`;
+    }
+
+    function startSession() {
+      if (state.session.running) return;
+      state.session.running = true;
+      if (!sessionTimer) {
+        sessionTimer = setInterval(() => {
+          state.session.elapsedSec += 1;
+          $("sessionClock").textContent = formatClock(state.session.elapsedSec);
+        }, 1000);
+      }
+      updateSessionStatusSummary();
+      saveState();
+    }
+
+    function pauseSession() {
+      state.session.running = false;
+      if (sessionTimer) {
+        clearInterval(sessionTimer);
+        sessionTimer = null;
+      }
+      updateSessionStatusSummary();
+      saveState();
+    }
+
+    function resetSession() {
+      pauseSession();
+      state.session.elapsedSec = 0;
+      state.session.setsDone = {};
+      $("sessionClock").textContent = formatClock(0);
+      renderSessionWorkout();
+      saveState();
+    }
+
+    function toggleSet(key) {
+      state.session.setsDone[key] = !state.session.setsDone[key];
+      saveState();
+      renderSessionWorkout();
+    }
+
+    function saveCompletedWorkout() {
+      const workout = workoutById(state.session.workoutId);
+      if (!workout) {
+        alert("Select a workout first.");
+        return;
+      }
+
+      const date = $("sessionDate").value || todayISO();
+      const calories = Number($("sessionCalories").value) || workout.calories;
+      const maxHr = Number($("sessionMaxHr").value) || null;
+      const rpeRaw = $("sessionRpe").value;
+      const rpe = rpeRaw === "" ? null : Number(rpeRaw);
+      const notes = $("sessionNotes").value.trim();
+      const { total, done } = totalAndDoneSets();
+
+      const durationMin = Math.max(1, Math.round(state.session.elapsedSec / 60) || workout.duration);
+      const entry = {
+        id: uniqueId("work"),
+        date,
+        workoutId: workout.id,
+        workoutName: workout.name,
+        durationMin,
+        calories: Math.round(calories),
+        maxHr,
+        rpe: Number.isFinite(rpe) ? clamp(rpe, 1, 10) : null,
+        completedSets: done,
+        totalSets: total,
+        notes
+      };
+
+      state.logs.workouts.push(entry);
+      state.logs.workouts.sort((a, b) => (a.date < b.date ? 1 : -1));
+
+      pauseSession();
+      state.session.date = date;
+      state.session.elapsedSec = 0;
+      state.session.setsDone = {};
+
+      saveState();
+      $("sessionClock").textContent = formatClock(0);
+      $("sessionStatus").textContent = `Saved: ${workout.name} on ${date}`;
+
+      renderSessionWorkout();
+      renderDashboard();
+      renderProgress();
+      renderChallengeList();
+    }
+
+    function startRestTimer() {
+      const btn = $("toggleRest");
+      if (restTimer) {
+        clearInterval(restTimer);
+        restTimer = null;
+        btn.textContent = "Start Rest";
+        return;
+      }
+
+      let left = Number($("restPreset").value) || 60;
+      $("restClock").textContent = `Rest: ${formatClock(left)}`;
+      btn.textContent = "Stop Rest";
+      restTimer = setInterval(() => {
+        left -= 1;
+        if (left <= 0) {
+          left = 0;
+          clearInterval(restTimer);
+          restTimer = null;
+          btn.textContent = "Start Rest";
+          if (navigator.vibrate) navigator.vibrate([140, 80, 140]);
+        }
+        $("restClock").textContent = `Rest: ${formatClock(left)}`;
+      }, 1000);
+    }
+
+    function macroTargetsFromProfile() {
+      const weight = Number(state.profile.weightKg);
+      if (!Number.isFinite(weight) || weight <= 0) return null;
+
+      let protein = 2.0;
+      let fat = 0.9;
+      let calorieFactor = 32;
+
+      if (state.profile.goal === "fat_loss") {
+        protein = 2.2;
+        fat = 0.8;
+        calorieFactor = 27;
+      } else if (state.profile.goal === "muscle") {
+        protein = 2.0;
+        fat = 1.0;
+        calorieFactor = 35;
+      } else if (state.profile.goal === "endurance") {
+        protein = 1.8;
+        fat = 0.9;
+        calorieFactor = 34;
+      } else if (state.profile.goal === "mobility") {
+        protein = 1.8;
+        fat = 1.0;
+        calorieFactor = 30;
+      }
+
+      const calories = Math.round(weight * calorieFactor);
+      const proteinG = Math.round(weight * protein);
+      const fatG = Math.round(weight * fat);
+      const carbsG = Math.max(80, Math.round((calories - proteinG * 4 - fatG * 9) / 4));
+
+      return { calories, proteinG, carbsG, fatG };
+    }
+
+    function renderMacroTargets() {
+      const wrap = $("macroTargets");
+      const hint = $("macroHint");
+      const targets = macroTargetsFromProfile();
+      if (!targets) {
+        wrap.innerHTML = `<span class="chip">Enter body weight in Planner.</span>`;
+        hint.textContent = "Save your profile first to generate personalized macro targets.";
+        return;
+      }
+
+      wrap.innerHTML = `
+        <span class="chip">Calories: ${targets.calories}</span>
+        <span class="chip">Protein: ${targets.proteinG} g</span>
+        <span class="chip">Carbs: ${targets.carbsG} g</span>
+        <span class="chip">Fat: ${targets.fatG} g</span>
+      `;
+      hint.textContent = "Targets update by goal and body weight. Use this as a starting point and adjust based on progress.";
+    }
+
+    function saveNutritionLog() {
+      const date = $("foodDate").value;
+      if (!date) {
+        alert("Select a date for nutrition log.");
+        return;
+      }
+
+      const entry = {
+        id: uniqueId("food"),
+        date,
+        calories: Number($("foodCalories").value) || 0,
+        protein: Number($("foodProtein").value) || 0,
+        carbs: Number($("foodCarbs").value) || 0,
+        fat: Number($("foodFat").value) || 0,
+        water: Number($("foodWater").value) || 0,
+        fasting: Number($("foodFasting").value) || 0,
+        voiceNote: $("foodVoice").value.trim()
+      };
+
+      const idx = state.logs.nutrition.findIndex(item => item.date === date);
+      if (idx >= 0) state.logs.nutrition[idx] = entry;
+      else state.logs.nutrition.push(entry);
+
+      saveState();
+      renderNutritionTable();
+      renderDashboard();
+      $("nutritionStatus").textContent = `Saved nutrition entry for ${date}.`;
+    }
+
+    function applyQuickFood() {
+      const barcode = $("barcodeInput").value.trim();
+      const matched = FOOD_DB[barcode];
+      if (matched) {
+        $("foodNameQuick").value = matched.name;
+        $("quickCalories").value = String(matched.calories);
+        $("quickProtein").value = String(matched.protein);
+        $("quickCarbs").value = String(matched.carbs);
+        $("quickFat").value = String(matched.fat);
+      }
+
+      const calories = Number($("quickCalories").value) || 0;
+      const protein = Number($("quickProtein").value) || 0;
+      const carbs = Number($("quickCarbs").value) || 0;
+      const fat = Number($("quickFat").value) || 0;
+
+      $("foodCalories").value = String((Number($("foodCalories").value) || 0) + calories);
+      $("foodProtein").value = String((Number($("foodProtein").value) || 0) + protein);
+      $("foodCarbs").value = String((Number($("foodCarbs").value) || 0) + carbs);
+      $("foodFat").value = String((Number($("foodFat").value) || 0) + fat);
+
+      if (matched) {
+        $("nutritionStatus").textContent = `Barcode matched: ${matched.name}. Macros added to current day.`;
+      } else {
+        $("nutritionStatus").textContent = "No barcode match found. Manual quick add applied.";
+      }
+    }
+
+    function copyMultiDayNutrition() {
+      const start = $("multiStart").value;
+      const end = $("multiEnd").value;
+      if (!start || !end) {
+        alert("Select start and end dates.");
+        return;
+      }
+
+      const dStart = parseISODate(start);
+      const dEnd = parseISODate(end);
+      if (!dStart || !dEnd || dEnd < dStart) {
+        alert("Invalid date range.");
+        return;
+      }
+
+      const template = {
+        calories: Number($("foodCalories").value) || 0,
+        protein: Number($("foodProtein").value) || 0,
+        carbs: Number($("foodCarbs").value) || 0,
+        fat: Number($("foodFat").value) || 0,
+        water: Number($("foodWater").value) || 0,
+        fasting: Number($("foodFasting").value) || 0,
+        voiceNote: $("foodVoice").value.trim()
+      };
+
+      const cursor = new Date(dStart);
+      let count = 0;
+      while (cursor <= dEnd) {
+        const date = toISODate(cursor);
+        const row = { id: uniqueId("food"), date, ...template };
+        const idx = state.logs.nutrition.findIndex(item => item.date === date);
+        if (idx >= 0) state.logs.nutrition[idx] = row;
+        else state.logs.nutrition.push(row);
+        count += 1;
+        cursor.setDate(cursor.getDate() + 1);
+      }
+
+      saveState();
+      renderNutritionTable();
+      renderDashboard();
+      $("nutritionStatus").textContent = `Copied nutrition template to ${count} day(s).`;
+    }
+
+    function renderNutritionTable() {
+      const body = $("nutritionBody");
+      const rows = [...state.logs.nutrition].sort((a, b) => (a.date < b.date ? 1 : -1));
+      if (!rows.length) {
+        body.innerHTML = `<tr><td colspan="8">No nutrition logs yet.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = rows.map(row => `
+        <tr>
+          <td>${row.date}</td>
+          <td>${row.calories}</td>
+          <td>${row.protein}</td>
+          <td>${row.carbs}</td>
+          <td>${row.fat}</td>
+          <td>${row.water}</td>
+          <td>${row.fasting}</td>
+          <td>${escapeHtml(row.voiceNote || "")}</td>
+        </tr>
+      `).join("");
+    }
+
+    function escapeHtml(v) {
+      return String(v)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function renderSimpleChart(svgId, values, color, label) {
+      const svg = $(svgId);
+      if (!svg) return;
+
+      if (!values.length || values.every(v => !Number.isFinite(v))) {
+        svg.innerHTML = `<text x="12" y="24" fill="#607785" font-size="12">No ${label} data yet.</text>`;
+        return;
+      }
+
+      const clean = values.map(v => Number.isFinite(v) ? v : 0);
+      const width = 360;
+      const height = 132;
+      const pad = 24;
+      const min = Math.min(...clean);
+      const max = Math.max(...clean);
+      const span = Math.max(max - min, 1);
+
+      const points = clean.map((v, i) => {
+        const x = pad + (i / Math.max(clean.length - 1, 1)) * (width - pad * 2);
+        const y = height - pad - ((v - min) / span) * (height - pad * 2);
+        return `${x},${y}`;
+      }).join(" ");
+
+      svg.innerHTML = `
+        <line x1="${pad}" y1="${height - pad}" x2="${width - pad}" y2="${height - pad}" stroke="#d8e5e2" />
+        <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${height - pad}" stroke="#d8e5e2" />
+        <polyline fill="none" stroke="${color}" stroke-width="2.8" points="${points}" />
+        <text x="${pad}" y="14" fill="#647b88" font-size="10">max ${max}</text>
+        <text x="${pad}" y="${height - 6}" fill="#647b88" font-size="10">min ${min}</text>
+      `;
+    }
+
+    function renderProgress() {
+      const badgeHost = $("progressBadges");
+      const streak = calculateStreak();
+      const pr = calculatePersonalBest();
+      const wk = currentWeekSessionStats();
+
+      const badges = [
+        `Streak: ${streak} day${streak === 1 ? "" : "s"}`,
+        `Week: ${wk.done}/${wk.target} sessions`
+      ];
+      if (pr) {
+        badges.push(`Best calories: ${pr.calories}`);
+        badges.push(`Best duration: ${pr.duration}`);
+      }
+      badgeHost.innerHTML = badges.map(item => `<span class="chip">${item}</span>`).join("");
+
+      const workoutRows = [...state.logs.workouts].sort((a, b) => (a.date < b.date ? -1 : 1));
+      const byWeek = new Map();
+      workoutRows.forEach(row => {
+        const d = parseISODate(row.date);
+        if (!d) return;
+        const week = toISODate(startOfWeekMonday(d));
+        byWeek.set(week, (byWeek.get(week) || 0) + 1);
+      });
+      const sessionsSeries = [...byWeek.entries()].sort((a, b) => a[0].localeCompare(b[0])).slice(-8).map(item => item[1]);
+      const calSeries = workoutRows.slice(-14).map(item => item.calories || 0);
+      const recSeries = [...state.logs.recovery].sort((a, b) => (a.date < b.date ? -1 : 1)).slice(-14).map(item => {
+        const r = calculateRecoveryReadiness(item);
+        return r ? r.score : 0;
+      });
+
+      renderSimpleChart("chartSessions", sessionsSeries, "#1f8f7b", "session");
+      renderSimpleChart("chartCalories", calSeries, "#dc6b48", "calorie");
+      renderSimpleChart("chartRecovery", recSeries, "#2d79be", "recovery");
+
+      const body = $("workoutHistoryBody");
+      if (!state.logs.workouts.length) {
+        body.innerHTML = `<tr><td colspan="7">No completed workouts yet.</td></tr>`;
+      } else {
+        body.innerHTML = [...state.logs.workouts]
+          .sort((a, b) => (a.date < b.date ? 1 : -1))
+          .map(row => `
+            <tr>
+              <td>${row.date}</td>
+              <td>${escapeHtml(row.workoutName)}</td>
+              <td>${row.durationMin} min</td>
+              <td>${row.calories}</td>
+              <td>${row.rpe ?? ""}</td>
+              <td>${row.completedSets}/${row.totalSets}</td>
+              <td>${escapeHtml(row.notes || "")}</td>
+            </tr>
+          `)
+          .join("");
+      }
+    }
+
+    function renderPosts() {
+      const host = $("postList");
+      const posts = [...state.posts].sort((a, b) => (a.ts < b.ts ? 1 : -1));
+      host.innerHTML = posts.map(post => `
+        <article class="community-post">
+          <strong>${escapeHtml(post.user)}</strong>
+          <div>${escapeHtml(post.text)}</div>
+          <div class="meta">${new Date(post.ts).toLocaleString()}</div>
+        </article>
+      `).join("");
+    }
+
+    function publishPost() {
+      const text = $("postText").value.trim();
+      if (!text) {
+        alert("Write a post first.");
+        return;
+      }
+      state.posts.push({
+        id: uniqueId("post"),
+        user: state.profile.name || "You",
+        text,
+        ts: new Date().toISOString()
+      });
+      $("postText").value = "";
+      saveState();
+      renderPosts();
+    }
+
+    function resetStarterPosts() {
+      state.posts = [...STARTER_POSTS];
+      saveState();
+      renderPosts();
+    }
+
+    function renderAll() {
+      loadProfileToForm();
+      renderProfileSnapshot();
+      renderPlan();
+      renderLibrary();
+      renderSessionWorkoutOptions();
+      renderMacroTargets();
+      renderNutritionTable();
+      renderDashboard();
+      renderProgress();
+      renderPosts();
+
+      $("sessionClock").textContent = formatClock(state.session.elapsedSec || 0);
+      $("sessionDate").value = state.session.date || todayISO();
+      $("foodDate").value = todayISO();
+      $("recoveryDate").value = todayISO();
+      $("multiStart").value = todayISO();
+      $("multiEnd").value = todayISO();
+      updateSessionStatusSummary();
+    }
+
+    function bindEvents() {
+      document.querySelectorAll(".tab-btn[data-tab]").forEach(btn => {
+        btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
+      });
+
+      document.querySelectorAll("[data-go-tab]").forEach(btn => {
+        btn.addEventListener("click", () => setActiveTab(btn.dataset.goTab));
+      });
+
+      $("saveProfile").addEventListener("click", () => {
+        readProfileFromForm();
+        generatePlan();
+      });
+
+      $("librarySearch").addEventListener("input", renderLibrary);
+      $("libraryType").addEventListener("change", renderLibrary);
+      $("libraryLevel").addEventListener("change", renderLibrary);
+      $("libraryEquip").addEventListener("change", renderLibrary);
+      $("libraryDurationMax").addEventListener("input", renderLibrary);
+
+      $("libraryBody").addEventListener("click", event => {
+        const btn = event.target.closest("[data-quick-plan]");
+        if (!btn) return;
+        addWorkoutToPlan(btn.dataset.quickPlan);
+      });
+
+      $("planList").addEventListener("click", event => {
+        const btn = event.target.closest("[data-plan-activate]");
+        if (!btn) return;
+        state.session.workoutId = btn.dataset.planActivate;
+        saveState();
+        renderSessionWorkoutOptions();
+        setActiveTab("session");
+      });
+
+      $("sessionWorkout").addEventListener("change", event => {
+        state.session.workoutId = event.target.value;
+        state.session.setsDone = {};
+        saveState();
+        renderSessionWorkout();
+      });
+
+      $("sessionDate").addEventListener("change", event => {
+        state.session.date = event.target.value;
+        saveState();
+      });
+
+      $("exerciseList").addEventListener("click", event => {
+        const btn = event.target.closest("[data-set-toggle]");
+        if (!btn) return;
+        toggleSet(btn.dataset.setToggle);
+      });
+
+      $("startSession").addEventListener("click", startSession);
+      $("pauseSession").addEventListener("click", pauseSession);
+      $("resetSession").addEventListener("click", resetSession);
+      $("saveSession").addEventListener("click", saveCompletedWorkout);
+
+      $("toggleRest").addEventListener("click", startRestTimer);
+      $("restPreset").addEventListener("change", () => {
+        if (restTimer) return;
+        $("restClock").textContent = `Rest: ${formatClock(Number($("restPreset").value) || 60)}`;
+      });
+
+      $("saveFoodLog").addEventListener("click", saveNutritionLog);
+      $("applyQuickAdd").addEventListener("click", applyQuickFood);
+      $("copyMultiDay").addEventListener("click", copyMultiDayNutrition);
+
+      $("saveRecovery").addEventListener("click", saveRecovery);
+
+      $("publishPost").addEventListener("click", publishPost);
+      $("seedPosts").addEventListener("click", resetStarterPosts);
+
+      $("exportJson").addEventListener("click", exportJson);
+      $("exportCsv").addEventListener("click", exportWorkoutCsv);
+      $("importJsonBtn").addEventListener("click", () => $("importJsonInput").click());
+      $("importJsonInput").addEventListener("change", importJson);
+    }
+
+    function exportJson() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `pulseforge_backup_${todayISO()}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function exportWorkoutCsv() {
+      const rows = [["date", "workout", "duration_min", "calories", "max_hr", "rpe", "completed_sets", "total_sets", "notes"]];
+      state.logs.workouts.forEach(row => {
+        rows.push([
+          row.date,
+          row.workoutName,
+          row.durationMin,
+          row.calories,
+          row.maxHr ?? "",
+          row.rpe ?? "",
+          row.completedSets,
+          row.totalSets,
+          row.notes || ""
+        ]);
+      });
+
+      const csv = rows.map(r => r.map(v => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `pulseforge_workouts_${todayISO()}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function importJson(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const parsed = JSON.parse(String(e.target.result || ""));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+          location.reload();
+        } catch {
+          alert("Invalid JSON file.");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    function restoreActiveTab() {
+      const saved = localStorage.getItem(ACTIVE_TAB_KEY);
+      if (!saved) return;
+      if (!document.getElementById(saved)) return;
+      setActiveTab(saved);
+    }
+
+    function enforceThreeDayGymMode() {
+      state.profile.daysPerWeek = FIXED_GYM_DAYS_PER_WEEK;
+      state.profile.weeklyTarget = FIXED_GYM_WEEKLY_TARGET;
+
+      state.challenges = state.challenges.map(ch => {
+        if (ch.metric === "sessions") {
+          return { ...ch, target: FIXED_GYM_WEEKLY_TARGET };
+        }
+        return ch;
+      });
+    }
+
+    function init() {
+      enforceThreeDayGymMode();
+      saveState();
+      renderAll();
+      bindEvents();
+      restoreActiveTab();
+
+      if (state.session.running) {
+        state.session.running = false;
+        saveState();
+      }
+      $("restClock").textContent = `Rest: ${formatClock(Number($("restPreset").value) || 60)}`;
+    }
+
+    init();
+  </script>
+</body>
+</html>

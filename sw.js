@@ -1,7 +1,8 @@
-const CACHE_NAME = "gym-follow-v1";
+const CACHE_NAME = "pulseforge-v1";
 const STATIC_ASSETS = [
   "./",
   "./index.html",
+  "./commercial-exercise-app.html",
   "./gym-workout-checklist.html",
   "./manifest.webmanifest",
   "./app-icon.svg",

@@ -1,40 +1,35 @@
-# Gym Workout Checklist
+# PulseForge Training OS
 
-Simple HTML workout tracker for a 3-day full-gym program.
+Commercial-style exercise app built as a single-page web app with local persistence and PWA support.
+
+## Main App
+
+- Entry page: `index.html`
+- Primary app: `commercial-exercise-app.html`
+- Legacy tracker kept for reference: `gym-workout-checklist.html`
 
 ## Features
 
-- 3-day split that trains major muscle groups 2x/week
-- Built-in protein target calculator
-- Per-exercise tracking for weights, reps, pain score, and notes
-- Follow-along mode with one exercise at a time
-- Cardio warm-up (10-15 min) and stretching cooldown (5 min) built into each day
-- Rest timer with start/pause/reset and +15s control
-- Auto-save using browser localStorage
-- CSV export
-- Video link per exercise
-- Daily effort summaries (calories, total minutes, max HR, RPE) with trend graphs
-- Installable web-app style experience (manifest + service worker)
+- Personalized onboarding with goal, experience, equipment, and preferred workout styles
+- Smart weekly plan generation with progression notes
+- Workout library with filters (type, level, equipment, duration, search)
+- Live session mode with set completion tracking, workout clock, and rest timer
+- Nutrition logging with macro targets, quick add, barcode lookup samples, fasting, and multi-day copy
+- Recovery check-ins (sleep, soreness, stress) with readiness scoring
+- Progress analytics: streaks, personal bests, history tables, and trend charts
+- Challenge tracking for sessions, hydration, and consistency streaks
+- Local community feed for accountability updates
+- Export/import support (`JSON`, workout `CSV`)
+- Installable app experience (`manifest.webmanifest` + `sw.js`)
 
 ## Run Locally
 
-Open `gym-workout-checklist.html` directly in your browser.
-
-## Use on Phone (same Wi-Fi)
-
-Serve the folder from your computer:
+Open `index.html` directly, or serve this directory:
 
 ```bash
 python3 -m http.server 8197
 ```
 
-Then open on phone:
+Then open:
 
-`http://<your-computer-ip>:8197/gym-workout-checklist.html`
-
-## Install on iPhone
-
-1. Open the app in Safari.
-2. Tap Share.
-3. Tap `Add to Home Screen`.
-4. Launch it from the home screen for full-screen follow-along mode.
+`http://127.0.0.1:8197/`

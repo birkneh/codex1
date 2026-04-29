@@ -1,11 +1,11 @@
 {
-  "name": "Gym Follow-Along",
-  "short_name": "Gym Follow",
-  "description": "3-day workout tracker with guided follow-along mode and rest timer.",
+  "name": "PulseForge Training OS",
+  "short_name": "PulseForge",
+  "description": "Commercial-style fitness planner with guided sessions, nutrition, recovery, and progress tracking.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f8f4e8",
-  "theme_color": "#0e9f6e",
+  "background_color": "#f1faf7",
+  "theme_color": "#156f63",
   "icons": [
     {
       "src": "./app-icon.svg",
