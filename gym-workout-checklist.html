@@ -1124,6 +1124,9 @@
           <div class="full" id="followSetBlock">
             <label>Sets</label>
             <div id="followSetsList" class="follow-sets"></div>
+            <div class="set-buttons">
+              <button class="btn secondary" id="followAddSet">+ Add Set</button>
+            </div>
           </div>
         </div>
 
@@ -2603,6 +2606,7 @@
       document.getElementById("followStopMain").addEventListener("click", stopFollowSession);
       document.getElementById("followTransitionNext").addEventListener("click", handleTransitionPrimaryAction);
       document.getElementById("followRestNext").addEventListener("click", handleRestNext);
+      document.getElementById("followAddSet").addEventListener("click", addFollowSet);
       document.getElementById("followSetsList").addEventListener("click", e => {
         const btn = e.target.closest("button[data-set-complete]");
         if (!btn) return;

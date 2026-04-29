@@ -687,7 +687,7 @@
 
         <article class="card col-5">
           <h2>Generated Weekly Plan</h2>
-          <p>Upper / Lower / Full-Body three-day gym split with progression notes.</p>
+          <p>Upper / Lower / Full-Body three-day gym split, tuned so major muscle groups get about 2x/week stimulus.</p>
           <div id="planList" class="stack"></div>
         </article>
 
@@ -1056,52 +1056,54 @@
     const WORKOUT_LIBRARY = [
       {
         id: "strength_upper_1",
-        name: "Upper Strength Builder",
+        name: "Upper Power + Hypertrophy",
         type: "Strength",
-        level: "intermediate",
-        duration: 45,
-        equipment: ["dumbbells", "bench"],
+        level: "advanced",
+        duration: 50,
+        equipment: ["dumbbells", "bench", "barbell"],
         goals: ["muscle", "recomp"],
-        calories: 420,
+        calories: 600,
         exercises: [
-          { name: "Incline Dumbbell Press", sets: 4, target: "8-10 reps" },
-          { name: "One-Arm Dumbbell Row", sets: 4, target: "10 reps / side" },
-          { name: "Seated Shoulder Press", sets: 3, target: "8-10 reps" },
-          { name: "Lateral Raise", sets: 3, target: "12-15 reps" },
-          { name: "Superset: Curl + Pressdown", sets: 3, target: "12 reps each" }
+          { name: "Bench Press (barbell or dumbbell)", sets: 4, target: "5-8 reps (heavy) | rest 2-3 min" },
+          { name: "Chest-Supported Row", sets: 4, target: "6-10 reps (heavy) | rest 2 min" },
+          { name: "Superset: Incline Dumbbell Press + Weighted Pull-Up/Lat Pulldown", sets: 3, target: "8-10 + 6-10 reps | 75-90 sec between rounds" },
+          { name: "Superset: Seated Shoulder Press + Cable/Band Lateral Raise", sets: 3, target: "6-10 + 12-20 reps | 60-90 sec between rounds" },
+          { name: "Superset: Triceps Pressdown + Dumbbell Curl", sets: 3, target: "10-15 reps each | 45-60 sec between rounds" }
         ]
       },
       {
         id: "strength_lower_1",
-        name: "Lower Strength and Stability",
+        name: "Lower Strength + Posterior Chain",
         type: "Strength",
-        level: "intermediate",
-        duration: 48,
-        equipment: ["dumbbells", "kettlebell"],
+        level: "advanced",
+        duration: 52,
+        equipment: ["dumbbells", "kettlebell", "barbell"],
         goals: ["muscle", "fat_loss", "recomp"],
-        calories: 460,
+        calories: 620,
         exercises: [
-          { name: "Goblet Squat", sets: 4, target: "10 reps" },
-          { name: "Romanian Deadlift", sets: 4, target: "8 reps" },
-          { name: "Split Squat", sets: 3, target: "10 reps / side" },
-          { name: "Hamstring Bridge", sets: 3, target: "12 reps" },
-          { name: "Plank", sets: 3, target: "45 sec" }
+          { name: "Back Squat (or heavy goblet squat)", sets: 4, target: "5-8 reps (heavy) | rest 2-3 min" },
+          { name: "Romanian Deadlift", sets: 4, target: "6-10 reps | rest 2 min" },
+          { name: "Superset: Bulgarian Split Squat + Hip Thrust", sets: 3, target: "8-12/leg + 8-12 reps | 75-90 sec between rounds" },
+          { name: "Superset: Leg Curl + Standing Calf Raise", sets: 3, target: "10-15 + 10-15 reps | 60-75 sec between rounds" },
+          { name: "Hanging Knee Raise or Plank", sets: 3, target: "10-15 reps or 45-60 sec | 45 sec rest" }
         ]
       },
       {
         id: "full_body_db",
-        name: "Full-Body Dumbbell Circuit",
-        type: "HIIT",
-        level: "beginner",
-        duration: 32,
-        equipment: ["dumbbells"],
-        goals: ["fat_loss", "recomp", "endurance"],
-        calories: 380,
+        name: "Full-Body Hypertrophy Density",
+        type: "Strength",
+        level: "advanced",
+        duration: 50,
+        equipment: ["dumbbells", "bench", "barbell"],
+        goals: ["muscle", "recomp", "fat_loss", "endurance"],
+        calories: 610,
         exercises: [
-          { name: "DB Thruster", sets: 4, target: "40 sec on / 20 sec off" },
-          { name: "Renegade Row", sets: 4, target: "40 sec on / 20 sec off" },
-          { name: "DB Reverse Lunge", sets: 4, target: "40 sec on / 20 sec off" },
-          { name: "Mountain Climbers", sets: 4, target: "40 sec on / 20 sec off" }
+          { name: "Front Squat (barbell) or Heavy Goblet Squat", sets: 4, target: "6-8 reps | rest 2 min" },
+          { name: "Flat Bench Press (barbell or dumbbell)", sets: 4, target: "6-10 reps (at least 4 hard sets) | rest 2 min" },
+          { name: "Weighted Pull-Up or Lat Pulldown", sets: 4, target: "6-10 reps | rest 90 sec" },
+          { name: "Superset: Bent-Over Row + Romanian Deadlift", sets: 3, target: "8-10 + 6-10 reps | 90 sec between rounds" },
+          { name: "Superset: Walking Lunge + Face Pull/Rear-Delt Raise", sets: 3, target: "10/leg + 12-15 reps | 60-75 sec between rounds" },
+          { name: "Farmer Carry", sets: 3, target: "30-40 m heavy carries" }
         ]
       },
       {
@@ -1546,20 +1548,20 @@
         {
           slot: THREE_DAY_GYM_SLOTS[0],
           label: "Day 1 - Upper Body",
-          candidates: ["strength_upper_1", "barbell_power", "core_strength"],
-          progression: "Prioritize heavy upper compounds, then add reps before load."
+          candidates: ["strength_upper_1", "barbell_power", "full_body_db"],
+          progression: "Heavy push/pull focus. Leave 1-2 reps in reserve, then add load once top reps are stable."
         },
         {
           slot: THREE_DAY_GYM_SLOTS[1],
           label: "Day 2 - Lower Body",
-          candidates: ["strength_lower_1", "barbell_power", "hybrid_conditioning"],
-          progression: "Progress lower-body load by 2-5% once all target reps are clean."
+          candidates: ["strength_lower_1", "barbell_power", "full_body_db"],
+          progression: "Lower-body strength emphasis. Progress loads 2-5% after all working sets hit target reps."
         },
         {
           slot: THREE_DAY_GYM_SLOTS[2],
           label: "Day 3 - Full Body",
-          candidates: ["full_body_db", "hybrid_conditioning", "core_strength", "mobility_repair"],
-          progression: "Use full-body day to accumulate quality volume without grinding to failure."
+          candidates: ["full_body_db", "barbell_power", "strength_upper_1", "strength_lower_1"],
+          progression: "Volume day to hit chest, back, shoulders, quads, and posterior chain for the second weekly stimulus."
         }
       ];
 
@@ -1606,6 +1608,32 @@
 
     function workoutById(id) {
       return WORKOUT_LIBRARY.find(item => item.id === id) || null;
+    }
+
+    function ensureWarmupAndCooldown(workout) {
+      if (!workout) return null;
+
+      const warmup = { name: "Cardio Warm-Up", sets: 1, target: "10 min moderate cardio" };
+      const cooldown = { name: "Stretching / Cooldown", sets: 1, target: "5 min mobility + stretching" };
+
+      const hasWarmup = workout.exercises.some(ex => String(ex.name).toLowerCase().includes("warm-up"));
+      const hasCooldown = workout.exercises.some(ex => {
+        const name = String(ex.name).toLowerCase();
+        return name.includes("cooldown") || name.includes("stretch");
+      });
+
+      const exercises = [...workout.exercises];
+      if (!hasWarmup) exercises.unshift(warmup);
+      if (!hasCooldown) exercises.push(cooldown);
+
+      return {
+        ...workout,
+        exercises
+      };
+    }
+
+    function sessionWorkoutById(id) {
+      return ensureWarmupAndCooldown(workoutById(id));
     }
 
     function renderPlan() {
@@ -1953,7 +1981,7 @@
     }
 
     function renderSessionWorkout() {
-      const workout = workoutById(state.session.workoutId);
+      const workout = sessionWorkoutById(state.session.workoutId);
       const host = $("exerciseList");
       const meta = $("sessionWorkoutMeta");
       if (!workout) {
@@ -1962,7 +1990,7 @@
         return;
       }
 
-      meta.textContent = `${workout.name} · ${workout.type} · ${workout.level} · ${workout.duration} min · Equip: ${workout.equipment.join(", ")}`;
+      meta.textContent = `${workout.name} · ${workout.type} · ${workout.level} · ${workout.duration} min main block + 15 min warm-up/cooldown (about 1.0-1.1h total) · Equip: ${workout.equipment.join(", ")}`;
       setDefaultsForSessionMetrics(workout);
 
       host.innerHTML = workout.exercises.map((ex, exIndex) => {
@@ -1986,7 +2014,7 @@
     }
 
     function totalAndDoneSets() {
-      const workout = workoutById(state.session.workoutId);
+      const workout = sessionWorkoutById(state.session.workoutId);
       if (!workout) return { total: 0, done: 0 };
       const total = workout.exercises.reduce((acc, ex) => acc + ex.sets, 0);
       const done = Object.values(state.session.setsDone).filter(Boolean).length;
@@ -1994,7 +2022,7 @@
     }
 
     function updateSessionStatusSummary() {
-      const workout = workoutById(state.session.workoutId);
+      const workout = sessionWorkoutById(state.session.workoutId);
       const { total, done } = totalAndDoneSets();
       const donePct = total ? Math.round((done / total) * 100) : 0;
       const status = state.session.running ? "Running" : "Paused";
@@ -2044,7 +2072,7 @@
     }
 
     function saveCompletedWorkout() {
-      const workout = workoutById(state.session.workoutId);
+      const workout = sessionWorkoutById(state.session.workoutId);
       if (!workout) {
         alert("Select a workout first.");
         return;
